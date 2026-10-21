@@ -10,7 +10,7 @@ from PIL import Image, ImageOps, ImageEnhance, UnidentifiedImageError
 date = os.environ["BRIEF_DATE"]
 slug = os.environ["SLUG"]
 url = os.environ["IMAGE_URL"]
-if not re.fullmatch(r"20\\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])", date):
+if not re.fullmatch(r"20\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])", date):
     raise ValueError("Invalid YYYY-MM-DD date")
 if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", slug):
     raise ValueError("Invalid slug")
