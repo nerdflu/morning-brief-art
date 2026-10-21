@@ -10,23 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Decode and archive
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          import base64
-          for source in Path("incoming").glob("*.b64"):
-              name = source.stem
-              if not name.startswith("20") or len(name) < 12:
-                  raise ValueError("Invalid dated image name")
-              date = name[:10]
-              target = Path("images") / date[:4] / date[5:7] / (name + ".png")
-              target.parent.mkdir(parents=True, exist_ok=True)
-              target.write_bytes(base64.b64decode(source.read_text().strip(), validate=True))
-              if not target.read_bytes().startswith(b"\x89PNG\r\n\x1a\n"):
-                  raise ValueError("Not PNG")
-              print(target)
-          PY
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Pillow
+        run: python -m pip install Pillow==11.3.0
+      - name: Decode, preserve and optimize images
+        run: python scripts/decode_incoming.py
       - name: Commit image
         run: |
           git config user.name "github-actions[bot]"
