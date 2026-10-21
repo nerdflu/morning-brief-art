@@ -23,7 +23,7 @@ jobs:
               target = Path("images") / date[:4] / date[5:7] / (name + ".png")
               target.parent.mkdir(parents=True, exist_ok=True)
               target.write_bytes(base64.b64decode(source.read_text().strip(), validate=True))
-              if not target.read_bytes().startswith(b"\\x89PNG\\r\\n\\x1a\\n"):
+              if not target.read_bytes().startswith(b"\x89PNG\r\n\x1a\n"):
                   raise ValueError("Not PNG")
               print(target)
           PY
