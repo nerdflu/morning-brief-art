@@ -1,0 +1,41 @@
+name: Test full resolution artwork
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/generate_full_res_fixture.py'
+permissions:
+  contents: write
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install Pillow==11.3.0
+      - run: python scripts/generate_full_res_fixture.py
+      - run: python scripts/decode_incoming.py
+      - name: Verify dimensions
+        run: |
+          python - <<'PY'
+          from PIL import Image
+          from pathlib import Path
+          original=Image.open("images/2026/10/2026-10-22-full-resolution-fixture-original.png")
+          display=Image.open("images/2026/10/2026-10-22-full-resolution-fixture.png")
+          assert original.size == (1536,1024), original.size
+          assert display.size == (960,480), display.size
+          print("Verified",original.size,display.size)
+          PY
+      - name: Commit outputs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add incoming/ images/
+          if ! git diff --cached --quiet; then
+            git commit -m "Publish full-resolution pipeline fixture"
+            git push
+          fi
