@@ -28,3 +28,5 @@ buf=io.BytesIO()
 im.save(buf,format="PNG",optimize=True)
 out.write_text(base64.b64encode(buf.getvalue()).decode())
 print("Source dimensions:",im.size,"bytes:",len(buf.getvalue()))
+
+# Trigger full-resolution integration test.
