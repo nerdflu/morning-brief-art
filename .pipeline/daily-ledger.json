@@ -1,0 +1,22 @@
+{
+  "budget-policy": {
+    "approval_reference": "user-approved-2026-10-27-AUD5-daily-art",
+    "basis": "Estimate only: USD .006025 x FX ceiling 2 x fees/tax factor 1.2; rounded up to AUD .10. New low 1024-square single-image calls hold AUD .50; validated successful usage settles at ceil(USD x2 FX x1.2 fees/tax x100)+1 cent, minimum 3 cents. Uncertain outcomes freeze spending.",
+    "month": "policy",
+    "per_call_hold_cents": 50,
+    "pilot_hold_cents": 10,
+    "policy_id": "flare-low-v1-reviewed",
+    "reserved_cents": 0,
+    "settle_success": true
+  },
+  "pilot:2026-10-26": {
+    "approval_reference": "user-approved-2026-10-27-AUD5-daily-art",
+    "estimated_cost_usd": 0.006025,
+    "invoice_verified": false,
+    "month": "2026-10",
+    "original_reserved_cents": 500,
+    "reserved_cents": 10,
+    "run_id": "40399275564",
+    "state": "pilot_estimate_reconciled"
+  }
+}
