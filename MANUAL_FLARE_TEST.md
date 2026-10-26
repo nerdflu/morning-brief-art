@@ -1,0 +1,13 @@
+# One approved Flare access test
+
+Workflow: `check-flare-access.yml`, manual `workflow_dispatch` only. It has no schedule, no push trigger, and never modifies TRMNL or the production images/manifest. The existing publisher triggers only for incoming/*.b64 and the fixture workflow only for its existing fixture script; this change matches neither path.
+
+The test reads the already saved repository Actions secret OPENAI_API_KEY in the runner, checks exact Flare model metadata, then makes at most one request to /v1/images/generations with model gpt-image-2.5-flare, low quality, 1024x1024, n=1, PNG, and a fixed synthetic lighthouse prompt. No private content, input images, fallback model, SDK retries or HTTP redirects. Model metadata alone is not reported as generation success.
+
+The user's A$5 monthly allowance includes this test. A single small JSON record under .pipeline-tests/ reserves that entire allowance before the paid request. The reservation and submitted state must each be pushed successfully before the API call. Any existing reservation or Actions rerun stops before another paid call. On timeout or cancellation after submission, leave the reservation in place; do not rerun automatically. This is a conservative one-test guard, not a provider billing hard cap or currency guarantee. Do not reset/delete the record to obtain a retry without reconciling the outcome and authorization.
+
+Only this JSON record is committed by the runner. Successful synthetic PNG and sanitized result JSON are temporary Actions artifacts (3-day retention), not production archive entries. Usage estimates use Flare standard text-input $5/M and image-output $30/M, assuming no image input; exclude tax/FX/fees and are not invoices. Official calculator estimates low 1024x1024 image output at 196 tokens / US$0.00588, plus prompt input. Actual usage is checked. Unexpected model, dimensions, input modality, absent usage or unusually high usage/cost stops for review. Post-response checks cannot retroactively prevent a provider charge, so no automatic further generation is allowed.
+
+Permissions: contents: write for this durable JSON reservation; existing checkout authentication handles the state commits. No additional key or Google credentials. Secret values and raw API error bodies are never printed. No local key copies.
+
+Local verification: install pinned Pillow==11.3.0 in an isolated environment, then `python -m unittest discover -s tests -v`. Tests are fully synthetic and do not call the API. To execute the approved test, use Actions → Approved one-time Flare access test → Run workflow → main once. Inspect its result before any further action.

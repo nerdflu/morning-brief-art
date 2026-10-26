@@ -1,0 +1,36 @@
+name: Approved one-time Flare access test
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: approved-flare-access-test
+  cancel-in-progress: false
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install existing pinned image validator
+        run: python -m pip install Pillow==11.3.0
+      - name: Run fixture tests without credentials
+        run: python -m unittest discover -s tests -v
+      - name: Check model and make the one approved small image
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python scripts/check_flare_access.py
+      - name: Retain synthetic test output only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: approved-flare-access-test
+          path: test-artifacts/
+          if-no-files-found: ignore
+          retention-days: 3
