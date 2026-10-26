@@ -6,12 +6,16 @@ on:
       - 'scripts/generate_full_res_fixture.py'
 permissions:
   contents: write
+concurrency:
+  group: morning-brief-art-writer
+  cancel-in-progress: false
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: main
           persist-credentials: true
       - uses: actions/setup-python@v5
         with:
@@ -39,3 +43,4 @@ jobs:
             git commit -m "Publish full-resolution pipeline fixture"
             git push
           fi
+

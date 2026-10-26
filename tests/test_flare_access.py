@@ -92,3 +92,4 @@ class Tests(unittest.TestCase):
         with self.assertRaisesRegex(p.PilotError,'unsupported_endpoint'):p.OpenAITransport('fixture').call('/other')
 
 if __name__=='__main__':unittest.main()
+

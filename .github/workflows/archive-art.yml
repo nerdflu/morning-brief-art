@@ -21,7 +21,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: morning-art-${{ inputs.brief_date }}
+  group: morning-brief-art-writer
   cancel-in-progress: false
 
 jobs:
@@ -30,6 +30,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: main
           persist-credentials: true
       - uses: actions/setup-python@v5
         with:
@@ -60,3 +61,4 @@ jobs:
           SLUG: ${{ inputs.slug }}
         run: |
           echo "https://raw.githubusercontent.com/${{ github.repository }}/main/images/${BRIEF_DATE:0:4}/${BRIEF_DATE:5:2}/${BRIEF_DATE}-${SLUG}.png" >> "$GITHUB_STEP_SUMMARY"
+

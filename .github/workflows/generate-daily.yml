@@ -1,0 +1,45 @@
+name: Generate daily art
+on:
+  push:
+    branches: [main]
+    paths: ['requests/*.json']
+  workflow_dispatch:
+    inputs:
+      request_json:
+        description: 'Reviewed public-safe {date,concept,style,layout,public_safe:true} JSON'
+        required: true
+        type: string
+permissions:
+  contents: write
+concurrency:
+  group: morning-brief-art-writer
+  cancel-in-progress: false
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install Pillow==11.3.0
+      - run: python -m unittest discover -s tests -v
+      - name: Generate and verify public archive
+        env:
+          ART_GLOBAL_LOCK: morning-brief-art-writer
+          ART_REQUEST_JSON: ${{ inputs.request_json }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python scripts/git_daily.py
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: daily-art-recovery-evidence
+          path: |
+            images/
+            manifests/
+            .pipeline/
+          retention-days: 7

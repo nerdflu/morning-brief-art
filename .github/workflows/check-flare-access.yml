@@ -4,7 +4,7 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: approved-flare-access-test
+  group: morning-brief-art-writer
   cancel-in-progress: false
 jobs:
   test:
@@ -34,3 +34,4 @@ jobs:
           path: test-artifacts/
           if-no-files-found: ignore
           retention-days: 3
+

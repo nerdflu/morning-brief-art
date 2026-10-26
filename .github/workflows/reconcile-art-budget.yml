@@ -1,0 +1,30 @@
+name: Approve art budget reconciliation
+on:
+  workflow_dispatch:
+    inputs:
+      approval_reference:
+        description: 'Reference to explicit approval of pilot A$0.10 / per-call A$0.50 holds and buffered successful usage settlement'
+        required: true
+        type: string
+permissions:
+  contents: write
+concurrency:
+  group: morning-brief-art-writer
+  cancel-in-progress: false
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install Pillow==11.3.0
+      - name: Apply explicitly approved estimate reconciliation
+        env:
+          ART_GLOBAL_LOCK: morning-brief-art-writer
+          APPROVAL_REFERENCE: ${{ inputs.approval_reference }}
+        run: python scripts/reconcile_budget.py --repo . --pilot .pipeline-tests/flare-access-2026-10-26.json --approval-reference "$APPROVAL_REFERENCE" --apply
