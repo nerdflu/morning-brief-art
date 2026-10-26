@@ -13,6 +13,7 @@ import json
 from PIL import Image, ImageOps, ImageEnhance
 from check_flare_access import MODEL, PARAMETERS, validate_result
 from public_prompt import validate_public_request
+from display_image import derive_display
 
 CAP_CENTS = 500
 
@@ -93,11 +94,8 @@ def generate(request, *, store, transport, publisher, pilot, clock=lambda: datet
                 if isinstance(details, dict):
                     metadata['reported_usage'][key] = {name: details[name] for name in ('text_tokens', 'image_tokens', 'cached_tokens')
                                                        if type(details.get(name)) is int and details[name] >= 0}
-            image = Image.open(io.BytesIO(raw)).convert('RGB')
-            display = ImageOps.pad(image, (960, 480), color='white', method=Image.Resampling.LANCZOS)
-            display = ImageEnhance.Contrast(ImageOps.grayscale(display)).enhance(1.3)
-            out = io.BytesIO(); display.save(out, format='PNG', optimize=True)
-            manifest = publisher(day, raw, out.getvalue(), copy.deepcopy(metadata))
+            display_bytes = derive_display(raw, request['layout'])
+            manifest = publisher(day, raw, display_bytes, copy.deepcopy(metadata))
             required = {'date', 'image_url', 'original_url', 'manifest_url', 'verified'}
             if not isinstance(manifest, dict) or not required.issubset(manifest) or manifest['date'] != day or manifest['verified'] is not True:
                 raise Stopped('publication_not_verified')
