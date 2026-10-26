@@ -1,4 +1,12 @@
 {
+  "2026-10-27": {
+    "date": "2026-10-27",
+    "fingerprint": "c0682a6ecc3d2ceeed0d48c3534f555e14e09fafc0edc481aa541956e03fa84c",
+    "model": "gpt-image-2.5-flare",
+    "month": "2026-10",
+    "reserved_cents": 50,
+    "state": "reserved"
+  },
   "budget-policy": {
     "approval_reference": "user-approved-2026-10-27-AUD5-daily-art",
     "basis": "Estimate only: USD .006025 x FX ceiling 2 x fees/tax factor 1.2; rounded up to AUD .10. New low 1024-square single-image calls hold AUD .50; validated successful usage settles at ceil(USD x2 FX x1.2 fees/tax x100)+1 cent, minimum 3 cents. Uncertain outcomes freeze spending.",
