@@ -5,12 +5,13 @@
     "invoice_verified": false,
     "manifest": {
       "date": "2026-10-27",
-      "display_sha256": "6b212489f7f5875fe1f0ab494dbd6a55ed042a48ff8e27daf1c7636a160f9f1d",
-      "image_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/78f0109e9f140907ad10e0a453f49033608ecc2f/images/2026/10/2026-10-27-flare.png",
-      "manifest_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/c628b1b428c1396a49eba094e961cd8e5a0003e2/manifests/2026-10-27.json",
+      "display_sha256": "b67f9f22409a78a82f59158484e8f1125f6c22920ddf5030ccd09c18f4909e53",
+      "image_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/7a346489c48d65ce64495ce35db2aff3ed9b4f1b/images/2026/10/2026-10-27-flare-framed.png",
       "model": "gpt-image-2.5-flare",
       "original_sha256": "f923efa7356bedddfe35adc7af74a395d2c9181412089968c7ec3d8b09967792",
       "original_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/78f0109e9f140907ad10e0a453f49033608ecc2f/images/2026/10/2026-10-27-flare-original.png",
+      "framing_revision": "non-school-central-172px-v1",
+      "manifest_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/6ae73a3387cc05a0a02bfb818f24fb35fc7b69db/manifests/2026-10-27.json",
       "verified": true
     },
     "model": "gpt-image-2.5-flare",
@@ -44,7 +45,12 @@
       "width": 1024
     },
     "settlement_basis": "usage_estimate_usd_x_2_fx_x_1.2_fees_tax_rounded_up_plus_1_cent",
-    "state": "complete"
+    "state": "complete",
+    "framing_repair": {
+      "reason": "Fit entire artwork within non-school shallow band",
+      "new_paid_calls": 0,
+      "original_unchanged": true
+    }
   },
   "budget-policy": {
     "approval_reference": "user-approved-2026-10-27-AUD5-daily-art",
