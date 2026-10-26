@@ -1,0 +1,14 @@
+{
+  "test_id": "flare-access-2026-10-26",
+  "run_id": "40399275564",
+  "state": "reserved",
+  "model": "gpt-image-2.5-flare",
+  "quality": "low",
+  "size": "1024x1024",
+  "n": 1,
+  "monthly_allowance_aud": 5,
+  "reserved_aud": 5,
+  "paid_requests_submitted": 0,
+  "metadata_visible": true,
+  "note": "Entire allowance reserved; no automatic release, retry or further paid generation."
+}
