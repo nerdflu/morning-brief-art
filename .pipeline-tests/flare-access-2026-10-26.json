@@ -1,7 +1,7 @@
 {
   "test_id": "flare-access-2026-10-26",
   "run_id": "40399275564",
-  "state": "submitted",
+  "state": "complete",
   "model": "gpt-image-2.5-flare",
   "quality": "low",
   "size": "1024x1024",
@@ -10,5 +10,15 @@
   "reserved_aud": 5,
   "paid_requests_submitted": 1,
   "metadata_visible": true,
-  "note": "Entire allowance reserved; no automatic release, retry or further paid generation."
+  "note": "Entire allowance reserved; no automatic release, retry or further paid generation.",
+  "width": 1024,
+  "height": 1024,
+  "sha256": "df1874e3bd0016c47023bbc64d79cf7749eb98f7aa819aac9445c8e37094627f",
+  "usage": {
+    "input_tokens": 29,
+    "output_tokens": 196
+  },
+  "estimated_cost_usd": 0.006025,
+  "cost_basis": "Flare standard text input $5/M; image output $30/M; excludes FX/fees/tax",
+  "request_id": "req_8fd78f1372fc4a698f80239936a098ac"
 }
