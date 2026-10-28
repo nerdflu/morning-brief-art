@@ -165,10 +165,49 @@
   "2026-10-29": {
     "date": "2026-10-29",
     "fingerprint": "1eb68c7cbf4a0cb60d3a3087a2f4c542e0b1ad17d1ad99d90f3b135b363a5871",
+    "invoice_verified": false,
+    "manifest": {
+      "date": "2026-10-29",
+      "display_sha256": "e753f941aaf0fe73bf0b71565c61d32cfc14efd3dbecaf38ca3de62f3f802327",
+      "image_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/6a81120765ae2efadefb63c196d760970d864581/images/2026/10/2026-10-29-flare.png",
+      "manifest_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/d4e062d7ae87c3693f8e78803986a3a42286a913/manifests/2026-10-29.json",
+      "model": "gpt-image-2.5-flare",
+      "original_sha256": "d4d631a6857f6dffb17f45660f80e66c1bcdb7d5cee75c627b0eede090a52623",
+      "original_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/6a81120765ae2efadefb63c196d760970d864581/images/2026/10/2026-10-29-flare-original.png",
+      "verified": true
+    },
     "model": "gpt-image-2.5-flare",
     "month": "2026-10",
-    "reserved_cents": 50,
-    "state": "submitted"
+    "original_reserved_cents": 50,
+    "reserved_cents": 3,
+    "result": {
+      "cost_basis": "Flare standard text input $5/M; image output $30/M; excludes FX/fees/tax",
+      "estimated_cost_usd": 0.006315,
+      "height": 1024,
+      "model": "gpt-image-2.5-flare",
+      "reported_usage": {
+        "input_tokens": 87,
+        "input_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 87
+        },
+        "output_tokens": 196,
+        "output_tokens_details": {
+          "image_tokens": 196,
+          "text_tokens": 0
+        },
+        "total_tokens": 283
+      },
+      "request_id": "req_84f0f0109c4c484989ad6eb58fd52730",
+      "sha256": "d4d631a6857f6dffb17f45660f80e66c1bcdb7d5cee75c627b0eede090a52623",
+      "usage": {
+        "input_tokens": 87,
+        "output_tokens": 196
+      },
+      "width": 1024
+    },
+    "settlement_basis": "usage_estimate_usd_x_2_fx_x_1.2_fees_tax_rounded_up_plus_1_cent",
+    "state": "complete"
   },
   "budget-policy": {
     "approval_reference": "user-approved-2026-10-27-AUD5-daily-art",
