@@ -102,16 +102,65 @@
   "2026-10-28:revision:gravity-v1": {
     "date": "2026-10-28",
     "fingerprint": "6286335e33b11984c3b19782f03f7e6b71d33035e46ed000aefe09d99388e004",
+    "invoice_verified": false,
+    "manifest": {
+      "date": "2026-10-28",
+      "display_sha256": "002f643b47e352eac7a159fcd1261758eddce782a3d0b20094373eda54b37ae2",
+      "framing": "band-fill-v1",
+      "image_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/7b5c6aa6069644901928e4f540be828b0aab8f32/images/2026/10/2026-10-28-revision-gravity-v1-flare.png",
+      "manifest_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/23d99271bca9fad31424a3c45761bbe65bf64d19/manifests/2026-10-28-revision-gravity-v1.json",
+      "model": "gpt-image-2.5-flare",
+      "original_sha256": "d13688f2d9c2c32ad5b4f7d6d04f85f2fe21ef47b3d53d588df8bae50569d9cf",
+      "original_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/7b5c6aa6069644901928e4f540be828b0aab8f32/images/2026/10/2026-10-28-revision-gravity-v1-flare-original.png",
+      "revision_id": "gravity-v1",
+      "supersedes_manifest_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/89c53d721ad98abf34561c0c325f66b4c25cd1d7/manifests/2026-10-28.json",
+      "verified": true
+    },
     "model": "gpt-image-2.5-flare",
     "month": "2026-10",
-    "reserved_cents": 50,
+    "original_reserved_cents": 50,
+    "reserved_cents": 3,
+    "result": {
+      "cost_basis": "Flare standard text input $5/M; image output $30/M; excludes FX/fees/tax",
+      "estimated_cost_usd": 0.006365,
+      "framing": "band-fill-v1",
+      "height": 1024,
+      "model": "gpt-image-2.5-flare",
+      "reported_usage": {
+        "input_tokens": 97,
+        "input_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 97
+        },
+        "output_tokens": 196,
+        "output_tokens_details": {
+          "image_tokens": 196,
+          "text_tokens": 0
+        },
+        "total_tokens": 293
+      },
+      "request_id": "req_c426cc2741854b438f20b3f3320df9ca",
+      "revision": {
+        "approval_reference": "user-approved-2026-10-28-one-replacement-no-paid-retries",
+        "id": "gravity-v1",
+        "max_reservation_cents": 50,
+        "supersedes_manifest_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/89c53d721ad98abf34561c0c325f66b4c25cd1d7/manifests/2026-10-28.json"
+      },
+      "sha256": "d13688f2d9c2c32ad5b4f7d6d04f85f2fe21ef47b3d53d588df8bae50569d9cf",
+      "usage": {
+        "input_tokens": 97,
+        "output_tokens": 196
+      },
+      "width": 1024
+    },
     "revision": {
       "approval_reference": "user-approved-2026-10-28-one-replacement-no-paid-retries",
       "id": "gravity-v1",
       "max_reservation_cents": 50,
       "supersedes_manifest_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/89c53d721ad98abf34561c0c325f66b4c25cd1d7/manifests/2026-10-28.json"
     },
-    "state": "submitted"
+    "settlement_basis": "usage_estimate_usd_x_2_fx_x_1.2_fees_tax_rounded_up_plus_1_cent",
+    "state": "complete"
   },
   "budget-policy": {
     "approval_reference": "user-approved-2026-10-27-AUD5-daily-art",
