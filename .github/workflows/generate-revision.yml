@@ -1,0 +1,42 @@
+name: Generate approved art revision
+on:
+  workflow_dispatch:
+    inputs:
+      revision_json:
+        description: 'Reviewed request and named revision envelope; explicit one-call approval required'
+        required: true
+        type: string
+permissions:
+  contents: write
+concurrency:
+  group: morning-brief-art-writer
+  cancel-in-progress: false
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install Pillow==11.3.0
+      - run: python -m unittest discover -s tests -v
+      - name: Generate one approved replacement and verify archive
+        env:
+          ART_GLOBAL_LOCK: morning-brief-art-writer
+          ART_REVISION_JSON: ${{ inputs.revision_json }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python scripts/git_revision.py
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: art-revision-recovery-evidence
+          path: |
+            images/
+            manifests/
+            .pipeline/
+          retention-days: 7

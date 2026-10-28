@@ -9,6 +9,7 @@ from decimal import Decimal, ROUND_CEILING
 import hashlib
 import io
 import json
+import re
 
 from PIL import Image, ImageOps, ImageEnhance
 from check_flare_access import MODEL, PARAMETERS, validate_result
@@ -46,7 +47,7 @@ def validate_request(request):
         raise Stopped('invalid_or_unreviewed_public_request') from None
 
 
-def generate(request, *, store, transport, publisher, pilot, clock=lambda: datetime.now(timezone.utc).date()):
+def generate(request, *, store, transport, publisher, pilot, clock=lambda: datetime.now(timezone.utc).date(), revision=None):
     """publisher(date, original_bytes, display_bytes, metadata) -> verified manifest.
 
     Publisher must archive both byte strings immutably, then publicly GET-verify
@@ -56,10 +57,31 @@ def generate(request, *, store, transport, publisher, pilot, clock=lambda: datet
     """
     day, prompt = validate_request(request)
     billing_month = clock().isoformat()[:7]
-    fingerprint = hashlib.sha256(json.dumps(request, sort_keys=True).encode()).hexdigest()
+    record_key = day
+    identity = request
+    if revision is not None:
+        expected = {'id', 'supersedes_manifest_url', 'max_reservation_cents', 'approval_reference'}
+        if (not isinstance(revision, dict) or set(revision) != expected
+                or not isinstance(revision['id'], str)
+                or not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*', revision['id'])
+                or len(revision['id']) > 40
+                or type(revision['max_reservation_cents']) is not int
+                or not 1 <= revision['max_reservation_cents'] <= CAP_CENTS
+                or not isinstance(revision['approval_reference'], str)
+                or not revision['approval_reference'].strip()
+                or len(revision['approval_reference']) > 200):
+            raise Stopped('invalid_revision_approval')
+        record_key = day + ':revision:' + revision['id']
+        identity = {'request': request, 'revision': revision}
+    fingerprint = hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
     with store.locked() as db:
         seed_pilot(db, pilot)
-        previous = get(db, day)
+        if revision is not None:
+            parent = get(db, day)
+            if (not parent or parent.get('state') != 'complete'
+                    or parent.get('manifest', {}).get('manifest_url') != revision['supersedes_manifest_url']):
+                raise Stopped('revision_requires_completed_original')
+        previous = get(db, record_key)
         if previous:
             if previous['fingerprint'] != fingerprint:
                 raise Stopped('date_conflict')
@@ -70,15 +92,20 @@ def generate(request, *, store, transport, publisher, pilot, clock=lambda: datet
         # Approved policy settles only validated success with buffered estimates.
         policy = get(db, 'budget-policy')
         reserve_cents = 50 if policy and policy.get('policy_id') == 'flare-low-v1-reviewed' else CAP_CENTS
+        if revision is not None:
+            if revision['max_reservation_cents'] < reserve_cents:
+                raise Stopped('revision_approval_below_required_reservation')
         records = db.records.values()
         reserved = sum(record['reserved_cents'] for record in records if record.get('month') == billing_month)
         if reserved + reserve_cents > CAP_CENTS:
             raise Stopped('monthly_budget_reserved')
         state = {'month': billing_month, 'date': day, 'fingerprint': fingerprint,
                  'state': 'reserved', 'reserved_cents': reserve_cents, 'model': MODEL}
-        save(db, day, state)
+        if revision is not None:
+            state['revision'] = copy.deepcopy(revision)
+        save(db, record_key, state)
         state['state'] = 'submitted'
-        save(db, day, state)
+        save(db, record_key, state)
         try:
             parameters = dict(PARAMETERS, prompt=prompt)
             response, request_id = transport.call('/images/generations', parameters)
@@ -94,11 +121,18 @@ def generate(request, *, store, transport, publisher, pilot, clock=lambda: datet
                 if isinstance(details, dict):
                     metadata['reported_usage'][key] = {name: details[name] for name in ('text_tokens', 'image_tokens', 'cached_tokens')
                                                        if type(details.get(name)) is int and details[name] >= 0}
-            display_bytes = derive_display(raw, request['layout'])
+            display_bytes = derive_display(raw, request['layout'], framing='band-fill-v1' if revision is not None else 'contain-v1')
+            if revision is not None:
+                metadata.update(revision=copy.deepcopy(revision), framing='band-fill-v1')
             manifest = publisher(day, raw, display_bytes, copy.deepcopy(metadata))
             required = {'date', 'image_url', 'original_url', 'manifest_url', 'verified'}
             if not isinstance(manifest, dict) or not required.issubset(manifest) or manifest['date'] != day or manifest['verified'] is not True:
                 raise Stopped('publication_not_verified')
+            if revision is not None and (manifest.get('revision_id') != revision['id']
+                    or manifest.get('supersedes_manifest_url') != revision['supersedes_manifest_url']
+                    or manifest.get('original_sha256') != hashlib.sha256(raw).hexdigest()
+                    or manifest.get('display_sha256') != hashlib.sha256(display_bytes).hexdigest()):
+                raise Stopped('revision_publication_not_verified')
             for field in ('image_url', 'original_url', 'manifest_url'):
                 if not isinstance(manifest[field], str) or not manifest[field].startswith('https://raw.githubusercontent.com/nerdflu/morning-brief-art/'):
                     raise Stopped('publication_url_not_allowed')
@@ -112,10 +146,10 @@ def generate(request, *, store, transport, publisher, pilot, clock=lambda: datet
                              settlement_basis='usage_estimate_usd_x_2_fx_x_1.2_fees_tax_rounded_up_plus_1_cent',
                              invoice_verified=False)
             state.update(state='complete', manifest=manifest, result=metadata)
-            save(db, day, state)
+            save(db, record_key, state)
             return manifest
         except Exception:
             state['state'] = 'uncertain_or_needs_review'
             state['reserved_cents'] = CAP_CENTS  # freeze further spending until human reconciliation
-            save(db, day, state)
+            save(db, record_key, state)
             raise Stopped('generation_or_publication_failed_no_retry') from None

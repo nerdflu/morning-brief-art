@@ -3,7 +3,9 @@ import io
 from PIL import Image, ImageOps, ImageEnhance
 
 
-def derive_display(raw, layout):
+def derive_display(raw, layout, framing='contain-v1'):
+    if framing not in ('contain-v1', 'band-fill-v1'):
+        raise ValueError('unsupported_framing')
     with Image.open(io.BytesIO(raw)) as source:
         original = ImageOps.exif_transpose(source).convert('RGB')
     if layout == 'school':
@@ -18,7 +20,10 @@ def derive_display(raw, layout):
         if bounds:
             left, top, right, bottom = bounds
             bounds = (max(0,left-4),max(0,top-4),min(gray.width,right+4),min(gray.height,bottom+4))
-            marks = ImageOps.contain(gray.crop(bounds), (936, 172), method=Image.Resampling.LANCZOS)
+            # Revision-only framing fills the band without stretching. This is
+            # a deliberate central crop; edge subjects require visual review.
+            fit = ImageOps.fit if framing == 'band-fill-v1' else ImageOps.contain
+            marks = fit(gray.crop(bounds), (936, 172), method=Image.Resampling.LANCZOS)
             display.paste(marks, ((960-marks.width)//2, (480-marks.height)//2))
     else:
         raise ValueError('unsupported_layout')

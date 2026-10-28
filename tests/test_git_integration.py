@@ -69,4 +69,32 @@ class Tests(unittest.TestCase):
             with self.assertRaises(Stopped):
                 generate({'date':'2026-11-01','concept':'A lighthouse with enormous origami sails.', 'style':'woodcut','layout':'non-school','public_safe':True},store=git.GitStore(self.root),transport=NoCalls(),publisher=None,pilot=self.pilot,clock=lambda:date(2026,11,1))
 
+    def test_versioned_revision_preserves_original_blobs_and_ledger(self):
+        import reconcile_budget
+        class Transport:
+            calls=0
+            def call(self, path, body):
+                self.calls+=1
+                buf=io.BytesIO();Image.new('RGB',(1024,1024),'white').save(buf,format='PNG')
+                return {'data':[{'b64_json':base64.b64encode(buf.getvalue()).decode()}], 'usage':{'input_tokens':29,'output_tokens':196}},'fixture-request'
+        transport=Transport()
+        with patch.dict(git.os.environ, {'ART_GLOBAL_LOCK':'morning-brief-art-writer','GITHUB_ACTIONS':'true','GITHUB_REPOSITORY':'nerdflu/morning-brief-art','GITHUB_REF':'refs/heads/main'}), patch.object(git.urllib.request,'urlopen',self.fake_public_get):
+            store=git.GitStore(self.root)
+            reconcile_budget.reconcile(store,self.pilot,'fixture-approval',True)
+            args=dict(store=store,transport=transport,publisher=git.GitPublisher(self.root),pilot=self.pilot,clock=lambda:date(2026,11,1))
+            request={'date':'2026-11-01','concept':'A lighthouse with enormous origami sails.', 'style':'woodcut','layout':'non-school','public_safe':True}
+            original=generate(request,**args)
+            old_ledger=json.loads(command(self.remote,'show','main:'+git.LEDGER))['2026-11-01']
+            old_files={str(p.relative_to(self.root)):p.read_bytes() for folder in ('images','manifests') for p in (self.root/folder).rglob('*') if p.is_file()}
+            revision={'id':'gravity-v1','supersedes_manifest_url':original['manifest_url'],'max_reservation_cents':50,'approval_reference':'fixture-one-call'}
+            result=generate(request,revision=revision,**args)
+            self.assertEqual(result['revision_id'],'gravity-v1')
+            self.assertIn('-revision-gravity-v1-flare.png',result['image_url'])
+            self.assertEqual(generate(request,revision=revision,**args),result)
+            self.assertEqual(transport.calls,2)
+            for path,raw in old_files.items():self.assertEqual((self.root/path).read_bytes(),raw)
+            ledger=json.loads(command(self.remote,'show','main:'+git.LEDGER))
+            self.assertEqual(ledger['2026-11-01'],old_ledger)
+            self.assertEqual(ledger['2026-11-01:revision:gravity-v1']['state'],'complete')
+
 if __name__=='__main__':unittest.main()

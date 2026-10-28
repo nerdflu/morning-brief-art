@@ -69,7 +69,14 @@ class GitPublisher:
     def __init__(self, root): self.root = Path(root)
     def __call__(self, day, original, display, metadata):
         folder = Path('images') / day[:4] / day[5:7]
-        paths = [folder / (day+'-flare-original.png'), folder / (day+'-flare.png')]
+        revision = metadata.get('revision')
+        suffix = ''
+        if revision is not None:
+            revision_id = revision.get('id', '')
+            if not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*', revision_id) or len(revision_id) > 40:
+                raise Stopped('invalid_revision_id')
+            suffix = '-revision-' + revision_id
+        paths = [folder / (day+suffix+'-flare-original.png'), folder / (day+suffix+'-flare.png')]
         for path, raw in zip(paths, [original, display]):
             target = self.root / path; target.parent.mkdir(parents=True, exist_ok=True)
             if target.exists() and target.read_bytes() != raw:
@@ -84,7 +91,13 @@ class GitPublisher:
                 data = response.read(20_000_001)
             if data != expected or Image.open(io.BytesIO(data)).size != size:
                 raise Stopped('public_art_verification_failed')
-        path = Path('manifests') / (day+'.json'); target = self.root/path; target.parent.mkdir(exist_ok=True)
+        if revision is not None:
+            manifest.update(revision_id=revision['id'], supersedes_manifest_url=revision['supersedes_manifest_url'],
+                            framing=metadata['framing'])
+        path = Path('manifests') / (day+suffix+'.json');
+        if revision is not None and (self.root/path).exists():
+            raise Stopped('immutable_revision_manifest_conflict')
+        target = self.root/path; target.parent.mkdir(exist_ok=True)
         target.write_text(json.dumps(manifest, indent=2, sort_keys=True)+'\n')
         sha = commit(self.root, [str(path)], 'Publish daily art manifest '+day)
         url = 'https://raw.githubusercontent.com/'+REPO+'/'+sha+'/'+str(path)
