@@ -111,7 +111,7 @@
       "max_reservation_cents": 50,
       "supersedes_manifest_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/89c53d721ad98abf34561c0c325f66b4c25cd1d7/manifests/2026-10-28.json"
     },
-    "state": "reserved"
+    "state": "submitted"
   },
   "budget-policy": {
     "approval_reference": "user-approved-2026-10-27-AUD5-daily-art",
