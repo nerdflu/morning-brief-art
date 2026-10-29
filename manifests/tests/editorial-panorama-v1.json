@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-30",
+  "display_sha256": "b108e6022734c4cc35084c35eb848c2a9d4a81919fbb1ae6ff06209a25bd85b1",
+  "format_contract": "panorama-v1",
+  "framing": "complete-scene-paper-trim-400-v1",
+  "height": 400,
+  "image_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/8170fcb0112d1e704925376e09e89091f2627a6f/images/tests/editorial-panorama-v1/panorama-v1.png",
+  "model": "gpt-image-2.5-flare",
+  "new_paid_calls_for_recovery": 0,
+  "original_height": 624,
+  "original_sha256": "52aadfd6ef77a2b034dd12b69aeee557dbb90462d0ab772e9eb618ea4145f051",
+  "original_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/86156811fcc51c35f4e5ae3ab9ad1b83627854e4/images/tests/editorial-panorama-v1/panorama-v1-original.png",
+  "original_width": 1872,
+  "paid_calls": 1,
+  "pixel_validation": "All source RGB values below 253 retained; removed near-white paper only; grayscale crop pixel equality, no resampling.",
+  "reused_original": true,
+  "source_band": [
+    0,
+    104,
+    1872,
+    504
+  ],
+  "test_id": "editorial-panorama-v1",
+  "width": 1872
+}
