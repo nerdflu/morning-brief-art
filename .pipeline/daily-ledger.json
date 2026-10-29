@@ -265,6 +265,9 @@
     "month": "2026-10",
     "n": 1,
     "original_reserved_cents": 50,
+    "original_sha256": "f7296cec6f4a20502b3ce699f5e5d28cff8a950cc5abd5e30888fd1b0e7cda0f",
+    "original_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/b158ce229e6952eb63efa0e554e9a152cf461be9/images/2026/10/2026-10-30-revision-school-reference-redo-v1-flare-original.png",
+    "paid_calls": 1,
     "quality": "low",
     "reserved_cents": 50,
     "result": {
@@ -296,7 +299,7 @@
     "revision_id": "school-reference-redo-v1",
     "run_id": "40951916057",
     "size": "1024x1024",
-    "state": "submitted",
+    "state": "awaiting_visual_review",
     "supersedes_manifest_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/23ce499264cc1dfe1b9ddcc208030a904a0b56bd/manifests/2026-10-30.json"
   },
   "budget-policy": {
