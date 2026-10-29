@@ -275,5 +275,13 @@
     "reserved_cents": 10,
     "run_id": "40399275564",
     "state": "pilot_estimate_reconciled"
+  },
+  "test:panorama-v1:editorial-panorama-v1": {
+    "date": "2026-10-30",
+    "fingerprint": "426367c39a13e4dd8dc94116092fe0d18ddb2baf3a0ff22ddf4cb6dd5cd44972",
+    "model": "gpt-image-2.5-flare",
+    "month": "2026-10",
+    "reserved_cents": 50,
+    "state": "reserved"
   }
 }
