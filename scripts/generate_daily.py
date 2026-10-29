@@ -47,7 +47,7 @@ def validate_request(request):
         raise Stopped('invalid_or_unreviewed_public_request') from None
 
 
-def generate(request, *, store, transport, publisher, pilot, clock=lambda: datetime.now(timezone.utc).date(), revision=None, panorama_test=None, source_archiver=None):
+def generate(request, *, store, transport, publisher, pilot, clock=lambda: datetime.now(timezone.utc).date(), revision=None, panorama_test=None, source_archiver=None, format_policy=None):
     """publisher(date, original_bytes, display_bytes, metadata) -> verified manifest.
 
     Publisher must archive both byte strings immutably, then publicly GET-verify
@@ -55,6 +55,12 @@ def generate(request, *, store, transport, publisher, pilot, clock=lambda: datet
     original_url, manifest_url and verified=True. It must not write the Sheet.
     No retry occurs here; any exception after submission permanently blocks date.
     """
+    from art_contracts import POLICY
+    if format_policy not in (None, POLICY) or (format_policy and (revision is not None or panorama_test is not None)):
+        raise Stopped('unsupported_format_policy')
+    v2 = format_policy == POLICY
+    if v2 and source_archiver is None and not callable(getattr(publisher, 'archive_original', None)):
+        raise Stopped('v2_source_archive_required_before_paid_call')
     panoramic = panorama_test is not None
     day, prompt = validate_request(request)
     billing_month = clock().isoformat()[:7]
@@ -92,6 +98,8 @@ def generate(request, *, store, transport, publisher, pilot, clock=lambda: datet
             if previous['fingerprint'] != fingerprint:
                 raise Stopped('date_conflict')
             if previous['state'] == 'complete':
+                if revision is None and panorama_test is None and callable(getattr(publisher, 'current_for', None)):
+                    return publisher.current_for(day, previous['manifest'])
                 return previous['manifest']
             raise Stopped('date_already_reserved_no_retry')
         # Full allowance reserved until explicit reviewed reconciliation is approved.
@@ -111,14 +119,22 @@ def generate(request, *, store, transport, publisher, pilot, clock=lambda: datet
             state['revision'] = copy.deepcopy(revision)
         save(db, record_key, state)
         state['state'] = 'submitted'
+        state['original_reserved_cents'] = reserve_cents
+        state['reserved_cents'] = CAP_CENTS  # cancellation/kill leaves unknown-outcome freeze
         save(db, record_key, state)
+        known_usage = False
         try:
             parameters = dict(PARAMETERS, prompt=prompt)
+            if v2:
+                from art_contracts import parameters as v2_parameters
+                parameters = v2_parameters(request)
             if panoramic:
                 from panorama import parameters as panorama_parameters
                 parameters = panorama_parameters(request)
             response, request_id = transport.call('/images/generations', parameters)
-            raw, metadata = validate_result(response, expected_size=(1872, 624) if panoramic else (1024, 1024))
+            expected_source = tuple(map(int, parameters['size'].split('x')))
+            raw, metadata = validate_result(response, expected_size=expected_source)
+            known_usage = True
             metadata['model'] = MODEL
             if isinstance(request_id, str) and len(request_id) < 120 and request_id.replace('_', '').replace('-', '').isalnum():
                 metadata['request_id'] = request_id
@@ -130,19 +146,35 @@ def generate(request, *, store, transport, publisher, pilot, clock=lambda: datet
                 if isinstance(details, dict):
                     metadata['reported_usage'][key] = {name: details[name] for name in ('text_tokens', 'image_tokens', 'cached_tokens')
                                                        if type(details.get(name)) is int and details[name] >= 0}
+            state['reserved_cents'] = reserve_cents
+            state['result'] = copy.deepcopy(metadata)
+            save(db, record_key, state)  # validated usage survives downstream failure
+            if v2:
+                from art_contracts import contract
+                c = contract(request['layout'])
+                metadata.update(format_contract=c['id'], layout=request['layout'],
+                                original_width=c['source'][0], original_height=c['source'][1])
+                archived = (source_archiver(raw, copy.deepcopy(metadata)) if source_archiver is not None
+                            else publisher.archive_original(day, raw, copy.deepcopy(metadata)))
+                if archived:
+                    metadata['archived_original_url'] = archived
             if panoramic:
                 metadata['test_id'] = panorama_test
                 state['result'] = copy.deepcopy(metadata)
                 save(db, record_key, state)  # retain actual usage even if framing fails
                 if source_archiver is not None:
                     source_archiver(raw, copy.deepcopy(metadata))
-            display_bytes = None if panoramic else derive_display(raw, request['layout'], framing='band-fill-v1' if revision is not None else 'contain-v1')
+            display_bytes = None if panoramic or v2 else derive_display(raw, request['layout'], framing='band-fill-v1' if revision is not None else 'contain-v1')
             if panoramic:
                 from panorama import derive_panorama
                 display_bytes, panorama_metadata = derive_panorama(raw)
                 metadata.update(panorama_metadata)
                 if panorama_test is not None:
                     metadata['test_id'] = panorama_test
+            if v2:
+                from art_contracts import derive as derive_v2
+                display_bytes, v2_metadata = derive_v2(raw, request['layout'])
+                metadata.update(v2_metadata)
             if revision is not None:
                 metadata.update(revision=copy.deepcopy(revision), framing='band-fill-v1')
             manifest = publisher(day, raw, display_bytes, copy.deepcopy(metadata))
@@ -155,6 +187,11 @@ def generate(request, *, store, transport, publisher, pilot, clock=lambda: datet
                     or manifest.get('original_sha256') != hashlib.sha256(raw).hexdigest()
                     or manifest.get('display_sha256') != hashlib.sha256(display_bytes).hexdigest()):
                 raise Stopped('panorama_test_publication_not_verified')
+            if v2:
+                from active_manifest import validate_manifest
+                validate_manifest(day, manifest, display_bytes, request['layout'])
+                if manifest.get('format_contract') != metadata['format_contract']:
+                    raise Stopped('published_contract_mismatch')
             if revision is not None and (manifest.get('revision_id') != revision['id']
                     or manifest.get('supersedes_manifest_url') != revision['supersedes_manifest_url']
                     or manifest.get('original_sha256') != hashlib.sha256(raw).hexdigest()
@@ -177,6 +214,8 @@ def generate(request, *, store, transport, publisher, pilot, clock=lambda: datet
             return manifest
         except Exception:
             state['state'] = 'uncertain_or_needs_review'
-            state['reserved_cents'] = CAP_CENTS  # freeze further spending until human reconciliation
+            state['reserved_cents'] = reserve_cents if known_usage else CAP_CENTS
+            if known_usage:
+                state['failure_accounting'] = 'validated_usage_conservative_original_hold_no_retry'
             save(db, record_key, state)
             raise Stopped('generation_or_publication_failed_no_retry') from None

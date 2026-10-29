@@ -67,58 +67,113 @@ class GitStore:
 
 class GitPublisher:
     def __init__(self, root): self.root = Path(root)
-    def __call__(self, day, original, display, metadata):
+
+    def paths(self, day, metadata):
         folder = Path('images') / day[:4] / day[5:7]
-        revision = metadata.get('revision')
-        test_id = metadata.get('test_id')
-        panoramic = metadata.get('format_contract') == 'panorama-v1'
-        if test_id is not None:
-            if revision is not None or not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*', test_id) or len(test_id) > 60 or metadata.get('format_contract') != 'panorama-v1':
-                raise Stopped('invalid_panorama_test_publication')
-            folder = Path('images/tests') / test_id
+        revision, test_id = metadata.get('revision'), metadata.get('test_id')
         suffix = ''
         if revision is not None:
             revision_id = revision.get('id', '')
-            if not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*', revision_id) or len(revision_id) > 40:
+            if not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*', revision_id) or len(revision_id)>40:
                 raise Stopped('invalid_revision_id')
-            suffix = '-revision-' + revision_id
-        stem = 'panorama-v1' if test_id is not None else day+suffix+'-flare'
-        paths = [folder / (stem+'-original.png'), folder / (stem+'.png')]
-        for path, raw in zip(paths, [original, display]):
-            target = self.root / path; target.parent.mkdir(parents=True, exist_ok=True)
-            if target.exists() and target.read_bytes() != raw:
-                raise Stopped('immutable_art_conflict')
-            target.write_bytes(raw)
-        sha = commit(self.root, [str(p) for p in paths], 'Archive daily Flare artwork '+day)
-        base = 'https://raw.githubusercontent.com/'+REPO+'/'+sha+'/'
-        manifest = {'date': day, 'original_url': base+str(paths[0]), 'image_url': base+str(paths[1]),
-                    'original_sha256': hashlib.sha256(original).hexdigest(), 'display_sha256': hashlib.sha256(display).hexdigest(), 'model': metadata.get('model', 'gpt-image-2.5-flare')}
-        original_size, display_size = ((1872,624),(1872,380)) if panoramic else ((1024,1024),(960,480))
-        if panoramic:
-            manifest.update(format_contract='panorama-v1', width=1872, height=380)
+            suffix = '-revision-'+revision_id
         if test_id is not None:
-            manifest['test_id'] = test_id
-        for url, expected, size in [(manifest['original_url'], original, original_size), (manifest['image_url'], display, display_size)]:
-            with urllib.request.urlopen(url, timeout=30) as response:
-                data = response.read(20_000_001)
-            if data != expected or Image.open(io.BytesIO(data)).size != size:
-                raise Stopped('public_art_verification_failed')
-        if revision is not None:
-            manifest.update(revision_id=revision['id'], supersedes_manifest_url=revision['supersedes_manifest_url'],
-                            framing=metadata['framing'])
-        path = Path('manifests') / (day+suffix+'.json');
-        if test_id is not None:
-            path = Path('manifests/tests') / (test_id+'.json')
-        if (revision is not None or test_id is not None) and (self.root/path).exists():
-            raise Stopped('immutable_revision_manifest_conflict')
-        target = self.root/path; target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(json.dumps(manifest, indent=2, sort_keys=True)+'\n')
-        sha = commit(self.root, [str(path)], 'Publish daily art manifest '+day)
-        url = 'https://raw.githubusercontent.com/'+REPO+'/'+sha+'/'+str(path)
+            if revision is not None or not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*',test_id) or len(test_id)>60 or metadata.get('format_contract')!='panorama-v1':
+                raise Stopped('invalid_panorama_test_publication')
+            folder=Path('images/tests')/test_id
+            stem='panorama-v1'
+            manifest=Path('manifests/tests')/(test_id+'.json')
+        else:
+            fmt=metadata.get('format_contract')
+            if fmt in ('school-2x1-v2','solo-panorama-v2'):
+                from art_contracts import contract
+                c=contract(metadata['layout'])
+                if c['id']!=fmt: raise Stopped('format_layout_mismatch')
+                stem=day+suffix+'-'+c['suffix']
+            else:
+                stem=day+suffix+'-flare'
+            manifest=Path('manifests')/(day+suffix+'.json')
+        return [folder/(stem+'-original.png'),folder/(stem+'.png')],manifest
+
+    def fetch_bytes(self, url):
         with urllib.request.urlopen(url, timeout=30) as response:
-            if json.loads(response.read(100_001)) != manifest:
-                raise Stopped('public_manifest_verification_failed')
-        return dict(manifest, manifest_url=url, verified=True)
+            return response.read(20_000_001)
+
+    def fetch_manifest(self,url):
+        from active_manifest import path
+        if not path(url).startswith('manifests/'):
+            raise Stopped('manifest_url_required')
+        return json.loads(self.fetch_bytes(url))
+
+    def archive_original(self,day,raw,metadata):
+        paths,_=self.paths(day,metadata)
+        target=self.root/paths[0]
+        if target.exists(): raise Stopped('immutable_original_already_exists')
+        target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(raw)
+        sha=commit(self.root,[str(paths[0])],'Archive unmodified daily source before formatting '+day)
+        url='https://raw.githubusercontent.com/'+REPO+'/'+sha+'/'+str(paths[0])
+        if self.fetch_bytes(url)!=raw: raise Stopped('public_source_verification_failed')
+        return url
+
+    def current_for(self,day,fallback):
+        pointer_path=self.root/'manifests/current'/str(day+'.json')
+        if not pointer_path.exists(): return fallback
+        from active_manifest import resolve_pointer
+        return resolve_pointer(day,json.loads(pointer_path.read_text()),self.fetch_manifest,self.fetch_bytes)
+
+    def publish_current(self,day,manifest_url,manifest):
+        from active_manifest import make_pointer
+        path=Path('manifests/current')/(day+'.json')
+        target=self.root/path
+        if target.exists():
+            # Ordinary generation never demotes an explicitly selected revision.
+            self.current_for(day,{})  # fail closed if the existing pointer is invalid
+            return
+        pointer=make_pointer(day,manifest_url,manifest)
+        target.parent.mkdir(parents=True,exist_ok=True)
+        target.write_text(json.dumps(pointer,indent=2,sort_keys=True)+'\n')
+        sha=commit(self.root,[str(path)],'Select verified daily artwork '+day)
+        url='https://raw.githubusercontent.com/'+REPO+'/'+sha+'/'+str(path)
+        if json.loads(self.fetch_bytes(url))!=pointer: raise Stopped('active_pointer_verification_failed')
+
+    def __call__(self,day,original,display,metadata):
+        paths,path=self.paths(day,metadata)
+        revision,test_id=metadata.get('revision'),metadata.get('test_id')
+        if (self.root/path).exists():
+            raise Stopped('immutable_revision_manifest_conflict' if revision is not None or test_id is not None else 'immutable_manifest_conflict')
+        for p,raw in zip(paths,[original,display]):
+            target=self.root/p;target.parent.mkdir(parents=True,exist_ok=True)
+            if target.exists() and target.read_bytes()!=raw: raise Stopped('immutable_art_conflict')
+            target.write_bytes(raw)
+        sha=commit(self.root,[str(p) for p in paths],'Archive daily Flare artwork '+day)
+        base='https://raw.githubusercontent.com/'+REPO+'/'+sha+'/'
+        manifest={'date':day,'original_url':metadata.get('archived_original_url',base+str(paths[0])),
+                  'image_url':base+str(paths[1]),'original_sha256':hashlib.sha256(original).hexdigest(),
+                  'display_sha256':hashlib.sha256(display).hexdigest(),'model':metadata.get('model','gpt-image-2.5-flare')}
+        fmt=metadata.get('format_contract')
+        if fmt in ('school-2x1-v2','solo-panorama-v2'):
+            from art_contracts import contract
+            c=contract(metadata['layout']);source_size,display_size=c['source'],c['display']
+            for key in ('format_contract','layout','width','height','original_width','original_height','framing','source_crop_bounds'):
+                manifest[key]=metadata[key]
+        elif fmt=='panorama-v1':
+            source_size,display_size=(1872,624),(1872,380)
+            manifest.update(format_contract=fmt,width=1872,height=380,test_id=test_id)
+        else:
+            source_size,display_size=(1024,1024),(960,480)
+        for url,expected,size in [(manifest['original_url'],original,source_size),(manifest['image_url'],display,display_size)]:
+            data=self.fetch_bytes(url)
+            if data!=expected or Image.open(io.BytesIO(data)).size!=size: raise Stopped('public_art_verification_failed')
+        if revision is not None:
+            manifest.update(revision_id=revision['id'],supersedes_manifest_url=revision['supersedes_manifest_url'],framing=metadata['framing'])
+        target=self.root/path;target.parent.mkdir(parents=True,exist_ok=True)
+        target.write_text(json.dumps(manifest,indent=2,sort_keys=True)+'\n')
+        sha=commit(self.root,[str(path)],'Publish daily art manifest '+day)
+        url='https://raw.githubusercontent.com/'+REPO+'/'+sha+'/'+str(path)
+        if json.loads(self.fetch_bytes(url))!=manifest: raise Stopped('public_manifest_verification_failed')
+        if fmt in ('school-2x1-v2','solo-panorama-v2') and revision is None and test_id is None:
+            self.publish_current(day,url,manifest)
+        return dict(manifest,manifest_url=url,verified=True)
 
 
 def resolve_request(root, event_name, event, manual_json=''):
@@ -160,7 +215,11 @@ def main():
     if request.get('date') != datetime.now(ZoneInfo('Australia/Brisbane')).date().isoformat():
         raise Stopped('only_current_brisbane_date_allowed')
     pilot = json.loads((root/'.pipeline-tests/flare-access-2026-10-26.json').read_text())
-    result = generate(request, store=GitStore(root), transport=OpenAITransport(os.environ['OPENAI_API_KEY']), publisher=GitPublisher(root), pilot=pilot)
+    policy_path=root/'.pipeline/art-policy.json'
+    policy=json.loads(policy_path.read_text()) if policy_path.exists() else {'policy_id':'mode-aware-ink-v2','enabled':False}
+    if set(policy)!={'policy_id','enabled'} or policy['policy_id']!='mode-aware-ink-v2' or type(policy['enabled']) is not bool:
+        raise Stopped('invalid_art_activation_policy')
+    result = generate(request, format_policy=policy['policy_id'] if policy['enabled'] else None, store=GitStore(root), transport=OpenAITransport(os.environ['OPENAI_API_KEY']), publisher=GitPublisher(root), pilot=pilot)
     print(json.dumps(result, sort_keys=True))
 
 if __name__ == '__main__':

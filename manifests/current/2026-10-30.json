@@ -1,0 +1,11 @@
+{
+  "approval_reference": "Owner-approved school-reference-redo-v1; coordinated migration approved 2026-10-30",
+  "date": "2026-10-30",
+  "display_sha256": "c220d0eafaac7a384335205d79d42a81e77f299d79a546067be8b58a35478778",
+  "format_contract": "legacy-v1",
+  "height": 480,
+  "manifest_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/4bad5f01e37a3ae2e8a0ced1195c7ca3cd04ade3/manifests/2026-10-30-revision-school-reference-redo-v1.json",
+  "revision_id": "school-reference-redo-v1",
+  "source": "approved-revision",
+  "width": 960
+}
