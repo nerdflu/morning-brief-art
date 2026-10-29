@@ -47,7 +47,7 @@ def validate_request(request):
         raise Stopped('invalid_or_unreviewed_public_request') from None
 
 
-def generate(request, *, store, transport, publisher, pilot, clock=lambda: datetime.now(timezone.utc).date(), revision=None):
+def generate(request, *, store, transport, publisher, pilot, clock=lambda: datetime.now(timezone.utc).date(), revision=None, panorama_test=None, source_archiver=None):
     """publisher(date, original_bytes, display_bytes, metadata) -> verified manifest.
 
     Publisher must archive both byte strings immutably, then publicly GET-verify
@@ -55,6 +55,7 @@ def generate(request, *, store, transport, publisher, pilot, clock=lambda: datet
     original_url, manifest_url and verified=True. It must not write the Sheet.
     No retry occurs here; any exception after submission permanently blocks date.
     """
+    panoramic = panorama_test is not None
     day, prompt = validate_request(request)
     billing_month = clock().isoformat()[:7]
     record_key = day
@@ -73,6 +74,11 @@ def generate(request, *, store, transport, publisher, pilot, clock=lambda: datet
             raise Stopped('invalid_revision_approval')
         record_key = day + ':revision:' + revision['id']
         identity = {'request': request, 'revision': revision}
+    if panorama_test is not None:
+        if revision is not None or not isinstance(panorama_test, str) or not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*', panorama_test) or len(panorama_test) > 60:
+            raise Stopped('invalid_panorama_test_identity')
+        record_key = 'test:panorama-v1:' + panorama_test
+        identity = {'request': request, 'format_contract': 'panorama-v1', 'test_id': panorama_test}
     fingerprint = hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
     with store.locked() as db:
         seed_pilot(db, pilot)
@@ -108,8 +114,11 @@ def generate(request, *, store, transport, publisher, pilot, clock=lambda: datet
         save(db, record_key, state)
         try:
             parameters = dict(PARAMETERS, prompt=prompt)
+            if panoramic:
+                from panorama import parameters as panorama_parameters
+                parameters = panorama_parameters(request)
             response, request_id = transport.call('/images/generations', parameters)
-            raw, metadata = validate_result(response)
+            raw, metadata = validate_result(response, expected_size=(1872, 624) if panoramic else (1024, 1024))
             metadata['model'] = MODEL
             if isinstance(request_id, str) and len(request_id) < 120 and request_id.replace('_', '').replace('-', '').isalnum():
                 metadata['request_id'] = request_id
@@ -121,13 +130,31 @@ def generate(request, *, store, transport, publisher, pilot, clock=lambda: datet
                 if isinstance(details, dict):
                     metadata['reported_usage'][key] = {name: details[name] for name in ('text_tokens', 'image_tokens', 'cached_tokens')
                                                        if type(details.get(name)) is int and details[name] >= 0}
-            display_bytes = derive_display(raw, request['layout'], framing='band-fill-v1' if revision is not None else 'contain-v1')
+            if panoramic:
+                metadata['test_id'] = panorama_test
+                state['result'] = copy.deepcopy(metadata)
+                save(db, record_key, state)  # retain actual usage even if framing fails
+                if source_archiver is not None:
+                    source_archiver(raw, copy.deepcopy(metadata))
+            display_bytes = None if panoramic else derive_display(raw, request['layout'], framing='band-fill-v1' if revision is not None else 'contain-v1')
+            if panoramic:
+                from panorama import derive_panorama
+                display_bytes, panorama_metadata = derive_panorama(raw)
+                metadata.update(panorama_metadata)
+                if panorama_test is not None:
+                    metadata['test_id'] = panorama_test
             if revision is not None:
                 metadata.update(revision=copy.deepcopy(revision), framing='band-fill-v1')
             manifest = publisher(day, raw, display_bytes, copy.deepcopy(metadata))
             required = {'date', 'image_url', 'original_url', 'manifest_url', 'verified'}
             if not isinstance(manifest, dict) or not required.issubset(manifest) or manifest['date'] != day or manifest['verified'] is not True:
                 raise Stopped('publication_not_verified')
+            if panoramic and ((panorama_test is not None and manifest.get('test_id') != panorama_test)
+                    or manifest.get('format_contract') != 'panorama-v1'
+                    or manifest.get('width') != 1872 or manifest.get('height') != 380
+                    or manifest.get('original_sha256') != hashlib.sha256(raw).hexdigest()
+                    or manifest.get('display_sha256') != hashlib.sha256(display_bytes).hexdigest()):
+                raise Stopped('panorama_test_publication_not_verified')
             if revision is not None and (manifest.get('revision_id') != revision['id']
                     or manifest.get('supersedes_manifest_url') != revision['supersedes_manifest_url']
                     or manifest.get('original_sha256') != hashlib.sha256(raw).hexdigest()

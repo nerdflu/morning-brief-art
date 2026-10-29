@@ -70,13 +70,20 @@ class GitPublisher:
     def __call__(self, day, original, display, metadata):
         folder = Path('images') / day[:4] / day[5:7]
         revision = metadata.get('revision')
+        test_id = metadata.get('test_id')
+        panoramic = metadata.get('format_contract') == 'panorama-v1'
+        if test_id is not None:
+            if revision is not None or not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*', test_id) or len(test_id) > 60 or metadata.get('format_contract') != 'panorama-v1':
+                raise Stopped('invalid_panorama_test_publication')
+            folder = Path('images/tests') / test_id
         suffix = ''
         if revision is not None:
             revision_id = revision.get('id', '')
             if not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*', revision_id) or len(revision_id) > 40:
                 raise Stopped('invalid_revision_id')
             suffix = '-revision-' + revision_id
-        paths = [folder / (day+suffix+'-flare-original.png'), folder / (day+suffix+'-flare.png')]
+        stem = 'panorama-v1' if test_id is not None else day+suffix+'-flare'
+        paths = [folder / (stem+'-original.png'), folder / (stem+'.png')]
         for path, raw in zip(paths, [original, display]):
             target = self.root / path; target.parent.mkdir(parents=True, exist_ok=True)
             if target.exists() and target.read_bytes() != raw:
@@ -86,7 +93,12 @@ class GitPublisher:
         base = 'https://raw.githubusercontent.com/'+REPO+'/'+sha+'/'
         manifest = {'date': day, 'original_url': base+str(paths[0]), 'image_url': base+str(paths[1]),
                     'original_sha256': hashlib.sha256(original).hexdigest(), 'display_sha256': hashlib.sha256(display).hexdigest(), 'model': metadata.get('model', 'gpt-image-2.5-flare')}
-        for url, expected, size in [(manifest['original_url'], original, (1024,1024)), (manifest['image_url'], display, (960,480))]:
+        original_size, display_size = ((1872,624),(1872,380)) if panoramic else ((1024,1024),(960,480))
+        if panoramic:
+            manifest.update(format_contract='panorama-v1', width=1872, height=380)
+        if test_id is not None:
+            manifest['test_id'] = test_id
+        for url, expected, size in [(manifest['original_url'], original, original_size), (manifest['image_url'], display, display_size)]:
             with urllib.request.urlopen(url, timeout=30) as response:
                 data = response.read(20_000_001)
             if data != expected or Image.open(io.BytesIO(data)).size != size:
@@ -95,9 +107,11 @@ class GitPublisher:
             manifest.update(revision_id=revision['id'], supersedes_manifest_url=revision['supersedes_manifest_url'],
                             framing=metadata['framing'])
         path = Path('manifests') / (day+suffix+'.json');
-        if revision is not None and (self.root/path).exists():
+        if test_id is not None:
+            path = Path('manifests/tests') / (test_id+'.json')
+        if (revision is not None or test_id is not None) and (self.root/path).exists():
             raise Stopped('immutable_revision_manifest_conflict')
-        target = self.root/path; target.parent.mkdir(exist_ok=True)
+        target = self.root/path; target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(json.dumps(manifest, indent=2, sort_keys=True)+'\n')
         sha = commit(self.root, [str(path)], 'Publish daily art manifest '+day)
         url = 'https://raw.githubusercontent.com/'+REPO+'/'+sha+'/'+str(path)

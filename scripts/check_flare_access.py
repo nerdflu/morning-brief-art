@@ -74,7 +74,7 @@ def usage_cost(usage):
     return counts, round(usd, 8)
 
 
-def validate_result(response):
+def validate_result(response, *, expected_size=(1024, 1024)):
     if not isinstance(response, dict) or response.get("model", MODEL) not in ALLOWED_MODELS:
         raise PilotError("unexpected_model")
     if not isinstance(response.get("data"), list) or len(response["data"]) != 1:
@@ -85,7 +85,7 @@ def validate_result(response):
         image.load()
     except Exception:
         raise PilotError("invalid_image") from None
-    if image.format != "PNG" or image.size != (1024, 1024):
+    if image.format != "PNG" or image.size != expected_size:
         raise PilotError("unexpected_dimensions_or_format")
     counts, usd = usage_cost(response.get("usage"))
     if counts["input_tokens"] > 512 or counts["output_tokens"] > 4096 or usd > 0.25:

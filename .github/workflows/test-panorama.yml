@@ -1,0 +1,46 @@
+name: Test one approved editorial panorama
+on:
+  workflow_dispatch:
+    inputs:
+      approved_test_id:
+        description: 'Parent-reviewed single nonproduction test: editorial-panorama-v1'
+        type: choice
+        options:
+          - editorial-panorama-v1
+        required: true
+permissions:
+  contents: write
+concurrency:
+  group: morning-brief-art-writer
+  cancel-in-progress: false
+jobs:
+  test-panorama:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install Pillow==11.3.0
+      - run: python -m unittest discover -s tests -v
+      - name: One named test, existing budget and no retries
+        env:
+          ART_GLOBAL_LOCK: morning-brief-art-writer
+          PANORAMA_TEST_APPROVED: ${{ inputs.approved_test_id }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python scripts/git_panorama_test.py
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: panorama-test-recovery-evidence
+          path: |
+            images/tests/
+            manifests/tests/
+            .pipeline/
+            .panorama-recovery/
+          retention-days: 7
+          include-hidden-files: true
