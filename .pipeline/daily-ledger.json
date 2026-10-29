@@ -267,6 +267,32 @@
     "original_reserved_cents": 50,
     "quality": "low",
     "reserved_cents": 50,
+    "result": {
+      "cost_basis": "Flare standard text input $5/M; image output $30/M; excludes FX/fees/tax",
+      "estimated_cost_usd": 0.007055,
+      "height": 1024,
+      "model": "gpt-image-2.5-flare",
+      "reported_usage": {
+        "input_tokens": 235,
+        "input_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 235
+        },
+        "output_tokens": 196,
+        "output_tokens_details": {
+          "image_tokens": 196,
+          "text_tokens": 0
+        },
+        "total_tokens": 431
+      },
+      "request_id": "req_d04d1218003e422a8c2c6fc583980146",
+      "sha256": "f7296cec6f4a20502b3ce699f5e5d28cff8a950cc5abd5e30888fd1b0e7cda0f",
+      "usage": {
+        "input_tokens": 235,
+        "output_tokens": 196
+      },
+      "width": 1024
+    },
     "revision_id": "school-reference-redo-v1",
     "run_id": "40951916057",
     "size": "1024x1024",
