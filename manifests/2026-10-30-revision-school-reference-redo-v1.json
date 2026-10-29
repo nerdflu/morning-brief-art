@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-30",
+  "display_sha256": "c220d0eafaac7a384335205d79d42a81e77f299d79a546067be8b58a35478778",
+  "fit_size": [
+    643,
+    448
+  ],
+  "framing": "whole-scene-school-contain-v1",
+  "height": 480,
+  "image_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/612cf0ecdfa5e0b50a0f4d5005bdb9e3a5bb1819/images/2026/10/2026-10-30-revision-school-reference-redo-v1-flare.png",
+  "model": "gpt-image-2.5-flare",
+  "original_height": 1024,
+  "original_sha256": "f7296cec6f4a20502b3ce699f5e5d28cff8a950cc5abd5e30888fd1b0e7cda0f",
+  "original_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/b158ce229e6952eb63efa0e554e9a152cf461be9/images/2026/10/2026-10-30-revision-school-reference-redo-v1-flare-original.png",
+  "original_width": 1024,
+  "paid_calls": 1,
+  "paste_xy": [
+    158,
+    16
+  ],
+  "resample": "LANCZOS",
+  "reviewed_at_current_school_slot": true,
+  "reviewed_at_phone_scale": true,
+  "revision_id": "school-reference-redo-v1",
+  "source_crop_bounds": [
+    0,
+    140,
+    1024,
+    853
+  ],
+  "source_pixels_preserved_in_archive": true,
+  "supersedes_manifest_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/23ce499264cc1dfe1b9ddcc208030a904a0b56bd/manifests/2026-10-30.json",
+  "width": 960
+}
