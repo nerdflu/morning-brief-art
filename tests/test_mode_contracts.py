@@ -27,6 +27,20 @@ class ModeContractTests(unittest.TestCase):
             self.assertLessEqual(len(p['prompt'].encode()),1800)
         p=c.parameters(self.request(style='paper-cut'))
         self.assertNotIn('Graphic paper-cut shapes',p['prompt'])
+    def test_school_fills_native_canvas_and_reserves_measured_date_badge(self):
+        r=self.request();r['concept']='A'*280
+        p=c.parameters(r)
+        for phrase in ('native 1536x768 (2:1)', 'Fill 85-95%', 'no baked-in blank side',
+                       'padded near-square', '40% of width and 20% of height',
+                       'x=0..614,y=0..154', 'no faces, heads'):
+            self.assertIn(phrase,p['prompt'])
+        self.assertLessEqual(len(p['prompt'].encode('ascii')),1800)
+        # Live624x299.648 slot, centered contain, badge right229.953/bottom53.969.
+        scale=299.6484375/480
+        offset=(624-960*scale)/2
+        self.assertLessEqual((229.953125-offset)/scale/960,0.40)
+        self.assertLessEqual(53.96875/scale/480,0.20)
+        self.assertNotIn('opaque date badge',c.parameters(self.request('non-school'))['prompt'])
     def test_school_preserves_entire_native_scene_and_gray_lines(self):
         raw=png((1536,768),(20,20,1515,747));out,meta=c.derive(raw,'school')
         im=Image.open(io.BytesIO(out))

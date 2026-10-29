@@ -29,9 +29,13 @@ def parameters(request):
     validate_public_request(request)  # unchanged five-field/private-input guard
     c = contract(request['layout'])
     composition = (
-        ' Compose a complete 2:1 scene for the left-hand school image box: a large'
-        ' foreground subject/group and simple supporting environment. Use 85-95%'
-        ' width, with safe paper margins; no internal letterbox or small central strip.'
+        ' Compose directly on the native 1536x768 (2:1) canvas for the school left box.'
+        ' Fill 85-95% of its width with one complete scene; no baked-in blank side'
+        ' gutters, internal letterbox, padded near-square picture or central strip.'
+        ' Reserve the upper-left 40% of width and 20% of height (x=0..614,y=0..154)'
+        ' as light quiet background for the opaque date badge; no faces, heads or'
+        ' important story details there. Use the remaining canvas for large readable'
+        ' subjects and supporting scenery; retain modest safe outer margins.'
         if request['layout'] == 'school' else
         ' Compose a genuinely shallow full-width panorama as a few large connected'
         ' forms, not many tiny objects. Use 85-95% width. The COMPLETE scene must fit'
