@@ -270,7 +270,7 @@
     "revision_id": "school-reference-redo-v1",
     "run_id": "40951916057",
     "size": "1024x1024",
-    "state": "reserved",
+    "state": "submitted",
     "supersedes_manifest_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/23ce499264cc1dfe1b9ddcc208030a904a0b56bd/manifests/2026-10-30.json"
   },
   "budget-policy": {
