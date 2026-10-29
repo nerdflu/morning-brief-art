@@ -7,11 +7,11 @@ Public, guest-safe illustrations for the TRMNL wall display.
 Store daily images at `images/YYYY/MM/YYYY-MM-DD-description.png`.
 
 For each image, use a public raw URL:
-`https://raw.githubusercontent.com/nerdflu/morning-brief-art/main/images/YYYY/MM/filename.png`
+`https://raw.githubusercontent.com/nerdflu/morning-brief-art/<immutable-commit>/images/YYYY/MM/filename.png`
 
-Images should be landscape, high contrast, black-and-white, thick-lined, and legible on small e-ink displays. Avoid personal/private details, including custody references. Keep original artwork separately if useful; optimize a display copy for e-ink.
+Images use expressive hand-drawn black-and-white forms, confident contrast and selective readable detail. See [mode contracts and active revision selection](MODE_CONTRACTS.md). Avoid personal/private details, including custody references. Always preserve the complete original and its verified display derivative.
 
-The Morning Brief Google Sheet `Briefs` tab has an `image_url` column (H). Set that cell only after the image is uploaded and its public URL is verified. Artwork is allowed in every mode, including solo days. Leave the cell blank when no verified image is available; text delivery must continue.
+The Morning Brief Google Sheet `Briefs` tab has an `image_url` column (H). Set that cell only after the image is uploaded and its public URL is verified. Artwork is allowed in every mode, including solo days. Preserve an existing verified image, otherwise leave the cell blank when none is available; text delivery must continue.
 
 
 ## Daily image route
