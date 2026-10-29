@@ -1,0 +1,44 @@
+name: Stage one approved school revision
+on:
+  workflow_dispatch:
+    inputs:
+      approved_revision_id:
+        description: 'One approved 2026-10-30 replacement, staged for visual review'
+        required: true
+        type: choice
+        options:
+          - school-reference-redo-v1
+permissions:
+  contents: write
+concurrency:
+  group: morning-brief-art-writer
+  cancel-in-progress: false
+jobs:
+  stage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install Pillow==11.3.0
+      - run: python -m unittest discover -s tests -v
+      - name: Generate once and archive source; no display or Sheet publication
+        env:
+          ART_GLOBAL_LOCK: morning-brief-art-writer
+          SCHOOL_REVISION_APPROVED: ${{ inputs.approved_revision_id }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python scripts/stage_school_revision.py
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: school-revision-recovery-evidence
+          path: |
+            .revision-recovery/
+            .pipeline/
+          include-hidden-files: true
+          retention-days: 7
