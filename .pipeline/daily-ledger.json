@@ -280,6 +280,33 @@
     "date": "2026-10-30",
     "fingerprint": "426367c39a13e4dd8dc94116092fe0d18ddb2baf3a0ff22ddf4cb6dd5cd44972",
     "invoice_verified": false,
+    "manifest": {
+      "date": "2026-10-30",
+      "display_sha256": "b108e6022734c4cc35084c35eb848c2a9d4a81919fbb1ae6ff06209a25bd85b1",
+      "format_contract": "panorama-v1",
+      "framing": "complete-scene-paper-trim-400-v1",
+      "height": 400,
+      "image_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/8170fcb0112d1e704925376e09e89091f2627a6f/images/tests/editorial-panorama-v1/panorama-v1.png",
+      "manifest_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/11ee7ad0ac4057688ec218e21acebcf96b6a6432/manifests/tests/editorial-panorama-v1.json",
+      "model": "gpt-image-2.5-flare",
+      "new_paid_calls_for_recovery": 0,
+      "original_height": 624,
+      "original_sha256": "52aadfd6ef77a2b034dd12b69aeee557dbb90462d0ab772e9eb618ea4145f051",
+      "original_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/86156811fcc51c35f4e5ae3ab9ad1b83627854e4/images/tests/editorial-panorama-v1/panorama-v1-original.png",
+      "original_width": 1872,
+      "paid_calls": 1,
+      "pixel_validation": "All source RGB values below 253 retained; removed near-white paper only; grayscale crop pixel equality, no resampling.",
+      "reused_original": true,
+      "source_band": [
+        0,
+        104,
+        1872,
+        504
+      ],
+      "test_id": "editorial-panorama-v1",
+      "verified": true,
+      "width": 1872
+    },
     "model": "gpt-image-2.5-flare",
     "month": "2026-10",
     "reconciliation": {
@@ -287,6 +314,19 @@
       "basis": "Verified successful API usage; retain original conservative AUD 0.50 reservation, not invoice settlement. Framing failure is not unknown API usage. No paid retry.",
       "estimated_cost_usd": 0.003035,
       "evidence_run": "40944992730"
+    },
+    "recovery": {
+      "basis": "Complete scene retained; only near-white paper margins removed; no resize or stretch.",
+      "display_height": 400,
+      "display_sha256": "b108e6022734c4cc35084c35eb848c2a9d4a81919fbb1ae6ff06209a25bd85b1",
+      "display_width": 1872,
+      "new_paid_calls": 0,
+      "source_band": [
+        0,
+        104,
+        1872,
+        504
+      ]
     },
     "reserved_cents": 50,
     "result": {
@@ -317,6 +357,6 @@
       "width": 1872
     },
     "review_hold_cents_before_reconciliation": 500,
-    "state": "uncertain_or_needs_review"
+    "state": "complete"
   }
 }
