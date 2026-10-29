@@ -256,6 +256,23 @@
     "settlement_basis": "usage_estimate_usd_x_2_fx_x_1.2_fees_tax_rounded_up_plus_1_cent",
     "state": "complete"
   },
+  "2026-10-30:revision:school-reference-redo-v1": {
+    "approval_reference": "Owner approved one today-only reference-style replacement 2026-10-30",
+    "date": "2026-10-30",
+    "fingerprint": "0d5de140003d1bd136a7f20b427b2cfe175c851f3df2c79a946f73f63a7b33ba",
+    "invoice_verified": false,
+    "model": "gpt-image-2.5-flare",
+    "month": "2026-10",
+    "n": 1,
+    "original_reserved_cents": 50,
+    "quality": "low",
+    "reserved_cents": 50,
+    "revision_id": "school-reference-redo-v1",
+    "run_id": "40951916057",
+    "size": "1024x1024",
+    "state": "reserved",
+    "supersedes_manifest_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/23ce499264cc1dfe1b9ddcc208030a904a0b56bd/manifests/2026-10-30.json"
+  },
   "budget-policy": {
     "approval_reference": "user-approved-2026-10-27-AUD5-daily-art",
     "basis": "Estimate only: USD .006025 x FX ceiling 2 x fees/tax factor 1.2; rounded up to AUD .10. New low 1024-square single-image calls hold AUD .50; validated successful usage settles at ceil(USD x2 FX x1.2 fees/tax x100)+1 cent, minimum 3 cents. Uncertain outcomes freeze spending.",
