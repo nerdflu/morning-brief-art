@@ -281,7 +281,7 @@
     "fingerprint": "426367c39a13e4dd8dc94116092fe0d18ddb2baf3a0ff22ddf4cb6dd5cd44972",
     "model": "gpt-image-2.5-flare",
     "month": "2026-10",
-    "reserved_cents": 50,
+    "reserved_cents": 500,
     "result": {
       "cost_basis": "Flare standard text input $5/M; image output $30/M; excludes FX/fees/tax",
       "estimated_cost_usd": 0.003035,
@@ -309,6 +309,6 @@
       },
       "width": 1872
     },
-    "state": "submitted"
+    "state": "uncertain_or_needs_review"
   }
 }
