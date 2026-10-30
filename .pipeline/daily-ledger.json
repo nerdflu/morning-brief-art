@@ -347,6 +347,7 @@
   },
   "2026-10-31": {
     "date": "2026-10-31",
+    "failure_accounting": "validated_usage_conservative_original_hold_no_retry",
     "fingerprint": "25abe9d38afec49848ee4d94cfcbbed8c9abaacc739399e2adbfe09547841697",
     "model": "gpt-image-2.5-flare",
     "month": "2026-10",
@@ -378,7 +379,7 @@
       },
       "width": 1872
     },
-    "state": "submitted"
+    "state": "uncertain_or_needs_review"
   },
   "budget-policy": {
     "approval_reference": "user-approved-2026-10-27-AUD5-daily-art",
