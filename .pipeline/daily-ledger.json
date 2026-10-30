@@ -349,9 +349,53 @@
     "date": "2026-10-31",
     "failure_accounting": "validated_usage_conservative_original_hold_no_retry",
     "fingerprint": "25abe9d38afec49848ee4d94cfcbbed8c9abaacc739399e2adbfe09547841697",
+    "manifest": {
+      "date": "2026-10-31",
+      "display_sha256": "031123db746b04bda05fe89751abf2551899291dbe32e5abbaa4f73e0565c5a4",
+      "fit_size": [
+        1200,
+        400
+      ],
+      "format_contract": "solo-panorama-v2",
+      "framing": "solo-panorama-v2-whole-source-fallback",
+      "framing_fallback": true,
+      "height": 400,
+      "image_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/17814c129367448786a2d4c32be03f2ba7576715/images/2026/10/2026-10-31-solo-panorama-v2.png",
+      "layout": "non-school",
+      "manifest_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/724943a9fe12b6741e72f4446c87d320140afd0f/manifests/2026-10-31.json",
+      "model": "gpt-image-2.5-flare",
+      "original_height": 624,
+      "original_sha256": "0adfd0209351db43dc361ee3f600aaed65454e8ef595dda10dca17d1a50a3863",
+      "original_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/3fa8dfbfa65a2aa22aaa2861a710b6969f8a72b9/images/2026/10/2026-10-31-solo-panorama-v2-original.png",
+      "original_width": 1872,
+      "paste_xy": [
+        336,
+        0
+      ],
+      "recovery": {
+        "failed_run_id": 41104197623,
+        "paid_calls": 0,
+        "reason": "validated-source-framing-recovery"
+      },
+      "source_crop_bounds": [
+        0,
+        0,
+        1872,
+        624
+      ],
+      "verified": true,
+      "width": 1872
+    },
     "model": "gpt-image-2.5-flare",
     "month": "2026-10",
     "original_reserved_cents": 50,
+    "recovery": {
+      "failed_run_id": 41104197623,
+      "paid_calls": 0,
+      "previous_state": "uncertain_or_needs_review",
+      "reason": "validated_source_formatting_recovered_original_50_cent_hold_preserved",
+      "source_sha256": "0adfd0209351db43dc361ee3f600aaed65454e8ef595dda10dca17d1a50a3863"
+    },
     "reserved_cents": 50,
     "result": {
       "cost_basis": "Flare standard text input $5/M; image output $30/M; excludes FX/fees/tax",
@@ -379,51 +423,21 @@
       },
       "width": 1872
     },
-    "state": "complete",
-    "manifest": {
-      "date": "2026-10-31",
-      "display_sha256": "031123db746b04bda05fe89751abf2551899291dbe32e5abbaa4f73e0565c5a4",
-      "fit_size": [
-        1200,
-        400
-      ],
-      "format_contract": "solo-panorama-v2",
-      "framing": "solo-panorama-v2-whole-source-fallback",
-      "framing_fallback": true,
-      "height": 400,
-      "image_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/17814c129367448786a2d4c32be03f2ba7576715/images/2026/10/2026-10-31-solo-panorama-v2.png",
-      "layout": "non-school",
-      "model": "gpt-image-2.5-flare",
-      "original_height": 624,
-      "original_sha256": "0adfd0209351db43dc361ee3f600aaed65454e8ef595dda10dca17d1a50a3863",
-      "original_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/3fa8dfbfa65a2aa22aaa2861a710b6969f8a72b9/images/2026/10/2026-10-31-solo-panorama-v2-original.png",
-      "original_width": 1872,
-      "paste_xy": [
-        336,
-        0
-      ],
-      "recovery": {
-        "failed_run_id": 41104197623,
-        "paid_calls": 0,
-        "reason": "validated-source-framing-recovery"
-      },
-      "source_crop_bounds": [
-        0,
-        0,
-        1872,
-        624
-      ],
-      "width": 1872,
-      "manifest_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/724943a9fe12b6741e72f4446c87d320140afd0f/manifests/2026-10-31.json",
-      "verified": true
+    "state": "complete"
+  },
+  "2026-10-31:revision:halloween-v1": {
+    "date": "2026-10-31",
+    "fingerprint": "04f3a837539f625b3a63e21ffb434bae87c0cfa4b9e13d5a84e31a9b93dbfb6a",
+    "model": "gpt-image-2.5-flare",
+    "month": "2026-10",
+    "reserved_cents": 50,
+    "revision": {
+      "approval_reference": "Owner-approved one Halloween replacement and live repair 2026-10-31",
+      "id": "halloween-v1",
+      "max_reservation_cents": 50,
+      "supersedes_manifest_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/724943a9fe12b6741e72f4446c87d320140afd0f/manifests/2026-10-31.json"
     },
-    "recovery": {
-      "previous_state": "uncertain_or_needs_review",
-      "paid_calls": 0,
-      "failed_run_id": 41104197623,
-      "reason": "validated_source_formatting_recovered_original_50_cent_hold_preserved",
-      "source_sha256": "0adfd0209351db43dc361ee3f600aaed65454e8ef595dda10dca17d1a50a3863"
-    }
+    "state": "reserved"
   },
   "budget-policy": {
     "approval_reference": "user-approved-2026-10-27-AUD5-daily-art",
