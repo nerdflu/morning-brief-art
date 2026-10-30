@@ -428,15 +428,65 @@
   "2026-10-31:revision:halloween-v1": {
     "date": "2026-10-31",
     "fingerprint": "04f3a837539f625b3a63e21ffb434bae87c0cfa4b9e13d5a84e31a9b93dbfb6a",
+    "invoice_verified": false,
+    "manifest": {
+      "date": "2026-10-31",
+      "display_sha256": "57d935192e9b9602f7cd006d38572a5601385cecbad8f7115fcaaa3edfddbc0d",
+      "fit_size": [
+        1200,
+        400
+      ],
+      "format_contract": "solo-panorama-v2",
+      "framing": "solo-panorama-v2-whole-source-fallback",
+      "framing_fallback": true,
+      "height": 400,
+      "image_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/e248c4b50eb7dc1b1807751a7e6c454720407e66/images/2026/10/2026-10-31-revision-halloween-v1-solo-panorama-v2.png",
+      "layout": "non-school",
+      "manifest_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/3fe62ea20e3095eb44f3f0b4113edb3c235c3417/manifests/2026-10-31-revision-halloween-v1.json",
+      "model": "gpt-image-2.5-flare",
+      "original_height": 624,
+      "original_sha256": "5b1bb64bdc1cd1cc654a50e09cb3d5ea6e57ab09abcc1825925aa94fecb09dc7",
+      "original_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/04e98bf32c69f6f0071facbfaa6d2aec94b74bc8/images/2026/10/2026-10-31-revision-halloween-v1-solo-panorama-v2-original.png",
+      "original_width": 1872,
+      "paste_xy": [
+        336,
+        0
+      ],
+      "revision_id": "halloween-v1",
+      "source_crop_bounds": [
+        0,
+        0,
+        1872,
+        624
+      ],
+      "supersedes_manifest_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/724943a9fe12b6741e72f4446c87d320140afd0f/manifests/2026-10-31.json",
+      "verified": true,
+      "width": 1872
+    },
     "model": "gpt-image-2.5-flare",
     "month": "2026-10",
     "original_reserved_cents": 50,
-    "reserved_cents": 50,
+    "reserved_cents": 2,
     "result": {
+      "archived_original_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/04e98bf32c69f6f0071facbfaa6d2aec94b74bc8/images/2026/10/2026-10-31-revision-halloween-v1-solo-panorama-v2-original.png",
       "cost_basis": "Flare standard text input $5/M; image output $30/M; excludes FX/fees/tax",
       "estimated_cost_usd": 0.00323,
-      "height": 624,
+      "fit_size": [
+        1200,
+        400
+      ],
+      "format_contract": "solo-panorama-v2",
+      "framing": "solo-panorama-v2-whole-source-fallback",
+      "framing_fallback": true,
+      "height": 400,
+      "layout": "non-school",
       "model": "gpt-image-2.5-flare",
+      "original_height": 624,
+      "original_width": 1872,
+      "paste_xy": [
+        336,
+        0
+      ],
       "reported_usage": {
         "input_tokens": 262,
         "input_tokens_details": {
@@ -451,7 +501,19 @@
         "total_tokens": 326
       },
       "request_id": "req_544a6f0e9c4843df996cedbde4a70fe1",
+      "revision": {
+        "approval_reference": "Owner-approved one Halloween replacement and live repair 2026-10-31",
+        "id": "halloween-v1",
+        "max_reservation_cents": 50,
+        "supersedes_manifest_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/724943a9fe12b6741e72f4446c87d320140afd0f/manifests/2026-10-31.json"
+      },
       "sha256": "5b1bb64bdc1cd1cc654a50e09cb3d5ea6e57ab09abcc1825925aa94fecb09dc7",
+      "source_crop_bounds": [
+        0,
+        0,
+        1872,
+        624
+      ],
       "usage": {
         "input_tokens": 262,
         "output_tokens": 64
@@ -464,7 +526,8 @@
       "max_reservation_cents": 50,
       "supersedes_manifest_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/724943a9fe12b6741e72f4446c87d320140afd0f/manifests/2026-10-31.json"
     },
-    "state": "submitted"
+    "settlement_basis": "usage_estimate_usd_x_2_fx_x_1.2_fees_tax_rounded_up_plus_1_cent",
+    "state": "complete"
   },
   "budget-policy": {
     "approval_reference": "user-approved-2026-10-27-AUD5-daily-art",
