@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-31",
+  "display_sha256": "57d935192e9b9602f7cd006d38572a5601385cecbad8f7115fcaaa3edfddbc0d",
+  "fit_size": [
+    1200,
+    400
+  ],
+  "format_contract": "solo-panorama-v2",
+  "framing": "solo-panorama-v2-whole-source-fallback",
+  "framing_fallback": true,
+  "height": 400,
+  "image_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/e248c4b50eb7dc1b1807751a7e6c454720407e66/images/2026/10/2026-10-31-revision-halloween-v1-solo-panorama-v2.png",
+  "layout": "non-school",
+  "model": "gpt-image-2.5-flare",
+  "original_height": 624,
+  "original_sha256": "5b1bb64bdc1cd1cc654a50e09cb3d5ea6e57ab09abcc1825925aa94fecb09dc7",
+  "original_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/04e98bf32c69f6f0071facbfaa6d2aec94b74bc8/images/2026/10/2026-10-31-revision-halloween-v1-solo-panorama-v2-original.png",
+  "original_width": 1872,
+  "paste_xy": [
+    336,
+    0
+  ],
+  "revision_id": "halloween-v1",
+  "source_crop_bounds": [
+    0,
+    0,
+    1872,
+    624
+  ],
+  "supersedes_manifest_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/724943a9fe12b6741e72f4446c87d320140afd0f/manifests/2026-10-31.json",
+  "width": 1872
+}
