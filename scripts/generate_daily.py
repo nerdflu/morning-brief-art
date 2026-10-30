@@ -56,7 +56,7 @@ def generate(request, *, store, transport, publisher, pilot, clock=lambda: datet
     No retry occurs here; any exception after submission permanently blocks date.
     """
     from art_contracts import POLICY
-    if format_policy not in (None, POLICY) or (format_policy and (revision is not None or panorama_test is not None)):
+    if format_policy not in (None, POLICY) or (format_policy and panorama_test is not None):
         raise Stopped('unsupported_format_policy')
     v2 = format_policy == POLICY
     if v2 and source_archiver is None and not callable(getattr(publisher, 'archive_original', None)):
@@ -152,6 +152,7 @@ def generate(request, *, store, transport, publisher, pilot, clock=lambda: datet
             if v2:
                 from art_contracts import contract
                 c = contract(request['layout'])
+                if revision is not None: metadata['revision']=copy.deepcopy(revision)
                 metadata.update(format_contract=c['id'], layout=request['layout'],
                                 original_width=c['source'][0], original_height=c['source'][1])
                 archived = (source_archiver(raw, copy.deepcopy(metadata)) if source_archiver is not None
@@ -176,7 +177,8 @@ def generate(request, *, store, transport, publisher, pilot, clock=lambda: datet
                 display_bytes, v2_metadata = derive_v2(raw, request['layout'])
                 metadata.update(v2_metadata)
             if revision is not None:
-                metadata.update(revision=copy.deepcopy(revision), framing='band-fill-v1')
+                metadata['revision']=copy.deepcopy(revision)
+                if not v2: metadata['framing']='band-fill-v1'
             manifest = publisher(day, raw, display_bytes, copy.deepcopy(metadata))
             required = {'date', 'image_url', 'original_url', 'manifest_url', 'verified'}
             if not isinstance(manifest, dict) or not required.issubset(manifest) or manifest['date'] != day or manifest['verified'] is not True:

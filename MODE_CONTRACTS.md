@@ -7,7 +7,7 @@ Requests retain exactly `date`, `concept`, `style`, `layout`, `public_safe`. Exi
 | school | 1536 × 768 | 960 × 480 | school-2x1-v2 |
 | non-school | 1872 × 624 | 1872 × 400 | solo-panorama-v2 |
 
-School retains the complete source scene with high-quality grayscale resize. Solo requires a complete shallow scene spanning at least 85% of the width, at most 388 pixels tall, with a 400-pixel window preserving every non-paper pixel and a six-pixel margin. It never stretches or crops subjects. Geometry rejection archives the original and stops without another paid call. No dates or headlines are generated into artwork. Existing dated assets and manifests remain immutable.
+School retains the complete source scene with high-quality grayscale resize. Solo requires a complete shallow scene spanning at least 85% of the width, at most 388 pixels tall, with a 400-pixel window preserving every non-paper pixel and a six-pixel margin. It never stretches or crops subjects. If the generated scene exceeds that window, a reliability fallback proportionally contains the complete original on the same1872x400 canvas, without stretching or clipping. It records framing_fallback, fit_size and paste_xy. This is not default art direction and never makes another paid call; blank/invalid sources still stop for review. No dates or headlines are generated into artwork. Existing dated assets and manifests remain immutable.
 
 ## Selection and publication
 

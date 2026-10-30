@@ -62,21 +62,24 @@ def derive(raw, layout):
         output = gray.resize(c['display'], Image.Resampling.LANCZOS)
         meta['source_crop_bounds'] = [0,0,*c['source']]
     else:
-        # The mask selects paper margins only. Published pixels retain all tones.
-        marks = gray.point(lambda p:255 if p<253 else 0).getbbox()
-        if not marks or marks[2]-marks[0] < round(gray.width*.85):
-            raise ValueError('panorama_width_needs_review')
-        if marks[3]-marks[1] > 388:
-            raise ValueError('complete_scene_too_tall_no_destructive_crop')
+        # Prefer the complete shallow window; contain the full source if the
+        # model ignores the requested band. Never crop subjects or call AI again.
+        marks=gray.point(lambda p:255 if p<253 else 0).getbbox()
+        if not marks: raise ValueError('blank_panorama_needs_review')
         top=max(0,min(gray.height-400,(marks[1]+marks[3]-400)//2))
-        if marks[1]-top<6 or top+400-marks[3]<6:
-            raise ValueError('panorama_antialias_margin_needs_review')
-        box=(0,top,gray.width,top+400)
-        for edge in (gray.crop((0,0,gray.width,top)),gray.crop((0,top+400,gray.width,gray.height))):
-            if edge.height and edge.getextrema()[0]<253:
-                raise ValueError('visible_art_outside_window')
-        output=gray.crop(box)
-        meta['source_crop_bounds']=list(box)
+        fits=(marks[2]-marks[0]>=round(gray.width*.85) and marks[3]-marks[1]<=388
+              and marks[1]-top>=6 and top+400-marks[3]>=6)
+        if fits:
+            box=(0,top,gray.width,top+400)
+            output=gray.crop(box);meta['source_crop_bounds']=list(box)
+        else:
+            fitted=ImageOps.contain(gray,c['display'],Image.Resampling.LANCZOS)
+            output=Image.new('L',c['display'],255)
+            xy=((output.width-fitted.width)//2,(output.height-fitted.height)//2)
+            output.paste(fitted,xy)
+            meta.update(framing='solo-panorama-v2-whole-source-fallback',
+                        source_crop_bounds=[0,0,*gray.size],framing_fallback=True,
+                        fit_size=list(fitted.size),paste_xy=list(xy))
     buf=io.BytesIO();output.save(buf,format='PNG',optimize=True)
     return buf.getvalue(), meta
 

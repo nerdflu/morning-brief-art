@@ -54,7 +54,20 @@ class ModeContractTests(unittest.TestCase):
         self.assertEqual(im.getpixel((100,100)),120)
     def test_tall_or_narrow_scene_never_destructively_cropped(self):
         for box in [(80,20,1790,610),(800,115,1000,495)]:
-            with self.assertRaises(ValueError):c.derive(png((1872,624),box),'non-school')
+            raw=png((1872,624),box);out,meta=c.derive(raw,'non-school')
+            self.assertTrue(meta['framing_fallback'])
+            self.assertEqual(meta['source_crop_bounds'],[0,0,1872,624])
+            expected=ImageOps.contain(ImageOps.grayscale(Image.open(io.BytesIO(raw))),(1872,400),Image.Resampling.LANCZOS)
+            actual=Image.open(io.BytesIO(out));x,y=meta['paste_xy']
+            self.assertEqual(actual.crop((x,y,x+expected.width,y+expected.height)).tobytes(),expected.tobytes())
+    def test_oct31_archived_source_and_blank_failure(self):
+        source=Path(__file__).resolve().parents[1]/'images/2026/10/2026-10-31-solo-panorama-v2-original.png'
+        raw=source.read_bytes()
+        self.assertEqual(hashlib.sha256(raw).hexdigest(),'0adfd0209351db43dc361ee3f600aaed65454e8ef595dda10dca17d1a50a3863')
+        out,meta=c.derive(raw,'non-school')
+        self.assertTrue(meta['framing_fallback']);self.assertEqual(meta['fit_size'],[1200,400])
+        self.assertEqual(meta['paste_xy'],[336,0]);self.assertEqual(Image.open(io.BytesIO(out)).size,(1872,400))
+        with self.assertRaisesRegex(ValueError,'blank_panorama'):c.derive(png((1872,624)),'non-school')
     def test_wrong_source_and_private_input_fail(self):
         with self.assertRaises(ValueError):c.derive(png((1024,1024)),'school')
         r=self.request();r['concept']='A child taking medication'

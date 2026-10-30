@@ -31,7 +31,10 @@ def main():
     envelope = resolve_revision(os.environ.get('ART_REVISION_JSON', ''), datetime.now(ZoneInfo('Australia/Brisbane')).date().isoformat())
     root = Path.cwd()
     pilot = json.loads((root/'.pipeline-tests/flare-access-2026-10-26.json').read_text())
-    result = generate(**envelope, store=GitStore(root), transport=OpenAITransport(os.environ['OPENAI_API_KEY']),
+    policy=json.loads((root/'.pipeline/art-policy.json').read_text())
+    if set(policy)!={'policy_id','enabled'} or policy['policy_id']!='mode-aware-ink-v2' or type(policy['enabled']) is not bool:
+        raise Stopped('invalid_art_activation_policy')
+    result = generate(**envelope, format_policy=policy['policy_id'] if policy['enabled'] else None, store=GitStore(root), transport=OpenAITransport(os.environ['OPENAI_API_KEY']),
                       publisher=GitPublisher(root), pilot=pilot)
     print(json.dumps(result, sort_keys=True))
 

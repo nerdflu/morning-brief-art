@@ -156,6 +156,8 @@ class GitPublisher:
             c=contract(metadata['layout']);source_size,display_size=c['source'],c['display']
             for key in ('format_contract','layout','width','height','original_width','original_height','framing','source_crop_bounds'):
                 manifest[key]=metadata[key]
+            for key in ('framing_fallback','fit_size','paste_xy'):
+                if key in metadata: manifest[key]=metadata[key]
         elif fmt=='panorama-v1':
             source_size,display_size=(1872,624),(1872,380)
             manifest.update(format_contract=fmt,width=1872,height=380,test_id=test_id)

@@ -71,14 +71,13 @@ class V2GenerationTests(unittest.TestCase):
         self.assertEqual(self.store.get('2026-11-01')['reserved_cents'],500)
         with self.assertRaises(g.Stopped):self.run_request()
         self.assertEqual(len(self.t.calls),1)
-    def test_known_framing_failure_preserves_source_usage_and_headroom(self):
+    def test_tall_scene_completes_without_paid_retry(self):
         self.t.tall=True
-        with self.assertRaises(g.Stopped):self.run_request(layout='non-school')
-        self.assertEqual(len(self.p.sources),1);self.assertEqual(self.p.manifests,[])
-        record=self.store.get('2026-11-01');self.assertEqual(record['reserved_cents'],50)
-        self.assertEqual(record['result']['usage']['output_tokens'],196)
-        self.t.tall=False;self.run_request('2026-11-02')
-        self.assertEqual(len(self.t.calls),2)
+        result=self.run_request(layout='non-school')
+        self.assertEqual(self.store.get('2026-11-01')['state'],'complete')
+        self.assertEqual(len(self.p.sources),1);self.assertEqual(len(self.p.manifests),1)
+        self.assertEqual(self.run_request(layout='non-school'),result)
+        self.assertEqual(len(self.t.calls),1)
     def test_missing_source_archiver_or_invalid_policy_prevents_call(self):
         request={'date':'2026-11-01','concept':'A large paper bird with a moon.','style':'ink','layout':'school','public_safe':True}
         for policy in (POLICY,'unreviewed'):
