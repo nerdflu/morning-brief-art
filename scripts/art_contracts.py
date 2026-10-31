@@ -57,8 +57,8 @@ def parameters(request, policy=POLICY):
     if policy==LANDSCAPE_POLICY and request['layout']=='solo':
         composition=(' Compose a natural wide landscape on the whole 1872x624 canvas.'
                      ' Use the full scene, without an internal blank strip, letterbox or'
-                     ' padded small picture. Keep the dominant subject in the central'
-                     ' 60% with generous surrounding scenery. CSS will cover a landscape'
+                     ' padded small picture. Keep important forms within the central vertical'
+                     ' 60% of the height, with scenery across the full width. CSS will cover a landscape'
                      ' header and may crop peripheral scenery; never bake in a date or'
                      ' headline. Large readable forms, not miniature detail.')
     prompt = request['concept'].strip()+ART_DIRECTION+composition
