@@ -32,8 +32,9 @@ def landscape_size(size):
 
 def contract(layout, policy=POLICY):
     if policy not in POLICIES: raise ValueError('unsupported_art_policy')
-    if policy==LANDSCAPE_POLICY and layout=='non-school':
+    if policy==LANDSCAPE_POLICY and layout=='solo':
         return {'id':LANDSCAPE_CONTRACT,'source':(1872,624),'display':(1872,624),'suffix':'landscape-cover-v3'}
+    if layout=='solo': raise ValueError('solo_requires_native_landscape_policy')
     return CONTRACTS[layout]
 
 
@@ -53,7 +54,7 @@ def parameters(request, policy=POLICY):
         ' forms, not many tiny objects. Use 85-95% width. The COMPLETE scene must fit'
         ' inside y=104..503 on the 1872x624 canvas; outside that band only blank white'
         ' paper. Keep all subjects away from the band edges. Readable at 468x100.')
-    if policy==LANDSCAPE_POLICY and request['layout']=='non-school':
+    if policy==LANDSCAPE_POLICY and request['layout']=='solo':
         composition=(' Compose a natural wide landscape on the whole 1872x624 canvas.'
                      ' Use the full scene, without an internal blank strip, letterbox or'
                      ' padded small picture. Keep the dominant subject in the central'
@@ -69,7 +70,7 @@ def parameters(request, policy=POLICY):
 
 def derive(raw, layout, policy=POLICY):
     c = contract(layout, policy)
-    native = policy==LANDSCAPE_POLICY and layout=='non-school'
+    native = policy==LANDSCAPE_POLICY and layout=='solo'
     with Image.open(io.BytesIO(raw)) as source:
         if source.format != 'PNG' or (not landscape_size(source.size) if native else source.size != c['source']):
             raise ValueError('source_contract_mismatch')
@@ -115,7 +116,7 @@ def expected(manifest):
     value=manifest.get('format_contract','legacy-v1')
     if value==LANDSCAPE_CONTRACT:
         size=(manifest.get('width'),manifest.get('height'))
-        if not landscape_size(size) or manifest.get('layout')!='non-school':
+        if not landscape_size(size) or manifest.get('layout')!='solo':
             raise ValueError('invalid_landscape_contract')
         return size
     if value == 'legacy-v1':

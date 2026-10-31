@@ -39,7 +39,7 @@ def validate_public_request(request):
     layout = request['layout']
     if not isinstance(style, str) or style not in STYLES:
         raise ValueError('unsupported_style')
-    if layout not in ('school', 'non-school'):
+    if layout not in ('school', 'non-school', 'solo'):
         raise ValueError('unsupported_layout')
     ratio = '2:1' if layout == 'school' else '5.1:1'
     prompt = (concept.strip() + ' ' + STYLES[style] +

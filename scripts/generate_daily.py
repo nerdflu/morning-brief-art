@@ -63,6 +63,8 @@ def generate(request, *, store, transport, publisher, pilot, clock=lambda: datet
         raise Stopped('v2_source_archive_required_before_paid_call')
     panoramic = panorama_test is not None
     day, prompt = validate_request(request)
+    if request['layout']=='solo' and format_policy!=LANDSCAPE_POLICY:
+        raise Stopped('solo_requires_native_landscape_policy')
     billing_month = clock().isoformat()[:7]
     record_key = day
     identity = request
@@ -133,7 +135,7 @@ def generate(request, *, store, transport, publisher, pilot, clock=lambda: datet
                 parameters = panorama_parameters(request)
             response, request_id = transport.call('/images/generations', parameters)
             expected_source = tuple(map(int, parameters['size'].split('x')))
-            raw, metadata = validate_result(response, expected_size=None if format_policy==LANDSCAPE_POLICY and request['layout']=='non-school' else expected_source)
+            raw, metadata = validate_result(response, expected_size=None if format_policy==LANDSCAPE_POLICY and request['layout']=='solo' else expected_source)
             known_usage = True
             metadata['model'] = MODEL
             if isinstance(request_id, str) and len(request_id) < 120 and request_id.replace('_', '').replace('-', '').isalnum():
