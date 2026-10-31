@@ -1,0 +1,10 @@
+{
+  "date": "2026-11-01",
+  "display_sha256": "28baef24c7a444503db03edf4ebba9676c3f4332bbef4d2395ef5003c9016e8d",
+  "format_contract": "solo-panorama-v2",
+  "height": 400,
+  "manifest_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/d1b5539d2e6e061820dcec5640143a2e762d4b18/manifests/2026-11-01.json",
+  "revision_id": null,
+  "source": "daily",
+  "width": 1872
+}
