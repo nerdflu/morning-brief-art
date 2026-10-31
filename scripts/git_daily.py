@@ -85,9 +85,9 @@ class GitPublisher:
             manifest=Path('manifests/tests')/(test_id+'.json')
         else:
             fmt=metadata.get('format_contract')
-            if fmt in ('school-2x1-v2','solo-panorama-v2'):
+            if fmt in ('school-2x1-v2','solo-panorama-v2','landscape-cover-v3'):
                 from art_contracts import contract
-                c=contract(metadata['layout'])
+                c=contract(metadata['layout'],'mode-aware-ink-v3' if fmt=='landscape-cover-v3' else 'mode-aware-ink-v2')
                 if c['id']!=fmt: raise Stopped('format_layout_mismatch')
                 stem=day+suffix+'-'+c['suffix']
             else:
@@ -151,9 +151,13 @@ class GitPublisher:
                   'image_url':base+str(paths[1]),'original_sha256':hashlib.sha256(original).hexdigest(),
                   'display_sha256':hashlib.sha256(display).hexdigest(),'model':metadata.get('model','gpt-image-2.5-flare')}
         fmt=metadata.get('format_contract')
-        if fmt in ('school-2x1-v2','solo-panorama-v2'):
+        if fmt in ('school-2x1-v2','solo-panorama-v2','landscape-cover-v3'):
             from art_contracts import contract
-            c=contract(metadata['layout']);source_size,display_size=c['source'],c['display']
+            c=contract(metadata['layout'],'mode-aware-ink-v3' if fmt=='landscape-cover-v3' else 'mode-aware-ink-v2');source_size,display_size=c['source'],c['display']
+            if fmt=='landscape-cover-v3':
+                from art_contracts import expected
+                display_size=expected(metadata)
+                source_size=(metadata['original_width'],metadata['original_height'])
             for key in ('format_contract','layout','width','height','original_width','original_height','framing','source_crop_bounds'):
                 manifest[key]=metadata[key]
             for key in ('framing_fallback','fit_size','paste_xy'):
@@ -173,7 +177,7 @@ class GitPublisher:
         sha=commit(self.root,[str(path)],'Publish daily art manifest '+day)
         url='https://raw.githubusercontent.com/'+REPO+'/'+sha+'/'+str(path)
         if json.loads(self.fetch_bytes(url))!=manifest: raise Stopped('public_manifest_verification_failed')
-        if fmt in ('school-2x1-v2','solo-panorama-v2') and revision is None and test_id is None:
+        if fmt in ('school-2x1-v2','solo-panorama-v2','landscape-cover-v3') and revision is None and test_id is None:
             self.publish_current(day,url,manifest)
         return dict(manifest,manifest_url=url,verified=True)
 
@@ -219,7 +223,7 @@ def main():
     pilot = json.loads((root/'.pipeline-tests/flare-access-2026-10-26.json').read_text())
     policy_path=root/'.pipeline/art-policy.json'
     policy=json.loads(policy_path.read_text()) if policy_path.exists() else {'policy_id':'mode-aware-ink-v2','enabled':False}
-    if set(policy)!={'policy_id','enabled'} or policy['policy_id']!='mode-aware-ink-v2' or type(policy['enabled']) is not bool:
+    if set(policy)!={'policy_id','enabled'} or policy['policy_id'] not in ('mode-aware-ink-v2','mode-aware-ink-v3') or type(policy['enabled']) is not bool:
         raise Stopped('invalid_art_activation_policy')
     result = generate(request, format_policy=policy['policy_id'] if policy['enabled'] else None, store=GitStore(root), transport=OpenAITransport(os.environ['OPENAI_API_KEY']), publisher=GitPublisher(root), pilot=pilot)
     print(json.dumps(result, sort_keys=True))

@@ -55,10 +55,10 @@ def generate(request, *, store, transport, publisher, pilot, clock=lambda: datet
     original_url, manifest_url and verified=True. It must not write the Sheet.
     No retry occurs here; any exception after submission permanently blocks date.
     """
-    from art_contracts import POLICY
-    if format_policy not in (None, POLICY) or (format_policy and panorama_test is not None):
+    from art_contracts import POLICY, LANDSCAPE_POLICY, POLICIES
+    if format_policy not in (None, *POLICIES) or (format_policy and panorama_test is not None):
         raise Stopped('unsupported_format_policy')
-    v2 = format_policy == POLICY
+    v2 = format_policy in POLICIES
     if v2 and source_archiver is None and not callable(getattr(publisher, 'archive_original', None)):
         raise Stopped('v2_source_archive_required_before_paid_call')
     panoramic = panorama_test is not None
@@ -127,13 +127,13 @@ def generate(request, *, store, transport, publisher, pilot, clock=lambda: datet
             parameters = dict(PARAMETERS, prompt=prompt)
             if v2:
                 from art_contracts import parameters as v2_parameters
-                parameters = v2_parameters(request)
+                parameters = v2_parameters(request, format_policy)
             if panoramic:
                 from panorama import parameters as panorama_parameters
                 parameters = panorama_parameters(request)
             response, request_id = transport.call('/images/generations', parameters)
             expected_source = tuple(map(int, parameters['size'].split('x')))
-            raw, metadata = validate_result(response, expected_size=expected_source)
+            raw, metadata = validate_result(response, expected_size=None if format_policy==LANDSCAPE_POLICY and request['layout']=='non-school' else expected_source)
             known_usage = True
             metadata['model'] = MODEL
             if isinstance(request_id, str) and len(request_id) < 120 and request_id.replace('_', '').replace('-', '').isalnum():
@@ -151,10 +151,10 @@ def generate(request, *, store, transport, publisher, pilot, clock=lambda: datet
             save(db, record_key, state)  # validated usage survives downstream failure
             if v2:
                 from art_contracts import contract
-                c = contract(request['layout'])
+                c = contract(request['layout'], format_policy)
                 if revision is not None: metadata['revision']=copy.deepcopy(revision)
                 metadata.update(format_contract=c['id'], layout=request['layout'],
-                                original_width=c['source'][0], original_height=c['source'][1])
+                                original_width=metadata['width'], original_height=metadata['height'])
                 archived = (source_archiver(raw, copy.deepcopy(metadata)) if source_archiver is not None
                             else publisher.archive_original(day, raw, copy.deepcopy(metadata)))
                 if archived:
@@ -174,7 +174,7 @@ def generate(request, *, store, transport, publisher, pilot, clock=lambda: datet
                     metadata['test_id'] = panorama_test
             if v2:
                 from art_contracts import derive as derive_v2
-                display_bytes, v2_metadata = derive_v2(raw, request['layout'])
+                display_bytes, v2_metadata = derive_v2(raw, request['layout'], format_policy)
                 metadata.update(v2_metadata)
             if revision is not None:
                 metadata['revision']=copy.deepcopy(revision)

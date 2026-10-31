@@ -30,7 +30,7 @@ def validate_manifest(day, manifest, image_bytes, layout=None):
     if layout and manifest.get('layout') and layout!=manifest['layout']:
         raise ValueError('layout_mismatch')
     fmt=manifest.get('format_contract','legacy-v1')
-    if (fmt=='school-2x1-v2' and not p.endswith('-school-v2.png')) or (fmt=='solo-panorama-v2' and not p.endswith('-solo-panorama-v2.png')):
+    if (fmt=='school-2x1-v2' and not p.endswith('-school-v2.png')) or (fmt=='solo-panorama-v2' and not p.endswith('-solo-panorama-v2.png')) or (fmt=='landscape-cover-v3' and not p.endswith('-landscape-cover-v3.png')):
         raise ValueError('versioned_path_mismatch')
     with Image.open(io.BytesIO(image_bytes)) as im:
         if im.format!='PNG' or im.size!=size:

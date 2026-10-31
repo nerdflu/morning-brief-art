@@ -5,6 +5,9 @@ from PIL import Image, ImageOps
 from public_prompt import validate_public_request
 
 POLICY = 'mode-aware-ink-v2'
+LANDSCAPE_POLICY = 'mode-aware-ink-v3'
+POLICIES = (POLICY, LANDSCAPE_POLICY)
+LANDSCAPE_CONTRACT = 'landscape-cover-v3'
 CONTRACTS = {
     'school': {'id': 'school-2x1-v2', 'source': (1536,768), 'display': (960,480), 'suffix': 'school-v2'},
     'non-school': {'id': 'solo-panorama-v2', 'source': (1872,624), 'display': (1872,400), 'suffix': 'solo-panorama-v2'},
@@ -21,13 +24,22 @@ ART_DIRECTION = (
     ' headlines, cats or dogs. Calm light upper-left for a separate date overlay.')
 
 
-def contract(layout):
+def landscape_size(size):
+    w,h=size
+    return (type(w) is int and type(h) is int and 600<=w<=4096
+            and 200<=h<=2048 and 1.25<=w/h<=4 and w*h<=8_388_608)
+
+
+def contract(layout, policy=POLICY):
+    if policy not in POLICIES: raise ValueError('unsupported_art_policy')
+    if policy==LANDSCAPE_POLICY and layout=='non-school':
+        return {'id':LANDSCAPE_CONTRACT,'source':(1872,624),'display':(1872,624),'suffix':'landscape-cover-v3'}
     return CONTRACTS[layout]
 
 
-def parameters(request):
+def parameters(request, policy=POLICY):
     validate_public_request(request)  # unchanged five-field/private-input guard
-    c = contract(request['layout'])
+    c = contract(request['layout'], policy)
     composition = (
         ' Compose directly on the native 1536x768 (2:1) canvas for the school left box.'
         ' Fill 85-95% of its width with one complete scene; no baked-in blank side'
@@ -41,6 +53,13 @@ def parameters(request):
         ' forms, not many tiny objects. Use 85-95% width. The COMPLETE scene must fit'
         ' inside y=104..503 on the 1872x624 canvas; outside that band only blank white'
         ' paper. Keep all subjects away from the band edges. Readable at 468x100.')
+    if policy==LANDSCAPE_POLICY and request['layout']=='non-school':
+        composition=(' Compose a natural wide landscape on the whole 1872x624 canvas.'
+                     ' Use the full scene, without an internal blank strip, letterbox or'
+                     ' padded small picture. Keep the dominant subject in the central'
+                     ' 60% with generous surrounding scenery. CSS will cover a landscape'
+                     ' header and may crop peripheral scenery; never bake in a date or'
+                     ' headline. Large readable forms, not miniature detail.')
     prompt = request['concept'].strip()+ART_DIRECTION+composition
     if len(prompt.encode('ascii')) > 1800:
         raise ValueError('bounded_service_prompt_exceeded')
@@ -48,19 +67,27 @@ def parameters(request):
             'size':f"{c['source'][0]}x{c['source'][1]}",'output_format':'png','prompt':prompt}
 
 
-def derive(raw, layout):
-    c = contract(layout)
+def derive(raw, layout, policy=POLICY):
+    c = contract(layout, policy)
+    native = policy==LANDSCAPE_POLICY and layout=='non-school'
     with Image.open(io.BytesIO(raw)) as source:
-        if source.format != 'PNG' or source.size != c['source']:
+        if source.format != 'PNG' or (not landscape_size(source.size) if native else source.size != c['source']):
             raise ValueError('source_contract_mismatch')
         gray = ImageOps.grayscale(ImageOps.exif_transpose(source))
     meta = {'format_contract':c['id'],'layout':layout,'width':c['display'][0],
-            'height':c['display'][1],'original_width':c['source'][0],
-            'original_height':c['source'][1],'framing':c['id']}
+            'height':c['display'][1],'original_width':gray.width,
+            'original_height':gray.height,'framing':c['id']}
     if layout == 'school':
         # Native2:1 ->2:1: preserve the complete source, no threshold/contrast/crop.
         output = gray.resize(c['display'], Image.Resampling.LANCZOS)
         meta['source_crop_bounds'] = [0,0,*c['source']]
+    elif native:
+        if not gray.point(lambda p:255 if p<253 else 0).getbbox():
+            raise ValueError('blank_landscape_needs_review')
+        output=gray
+        meta.update(width=gray.width,height=gray.height,
+                    framing='native-landscape-cover-v3',
+                    source_crop_bounds=[0,0,gray.width,gray.height])
     else:
         # Prefer the complete shallow window; contain the full source if the
         # model ignores the requested band. Never crop subjects or call AI again.
@@ -86,6 +113,11 @@ def derive(raw, layout):
 
 def expected(manifest):
     value=manifest.get('format_contract','legacy-v1')
+    if value==LANDSCAPE_CONTRACT:
+        size=(manifest.get('width'),manifest.get('height'))
+        if not landscape_size(size) or manifest.get('layout')!='non-school':
+            raise ValueError('invalid_landscape_contract')
+        return size
     if value == 'legacy-v1':
         return (960,480)
     for c in CONTRACTS.values():

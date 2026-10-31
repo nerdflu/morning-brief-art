@@ -32,7 +32,7 @@ def main():
     root = Path.cwd()
     pilot = json.loads((root/'.pipeline-tests/flare-access-2026-10-26.json').read_text())
     policy=json.loads((root/'.pipeline/art-policy.json').read_text())
-    if set(policy)!={'policy_id','enabled'} or policy['policy_id']!='mode-aware-ink-v2' or type(policy['enabled']) is not bool:
+    if set(policy)!={'policy_id','enabled'} or policy['policy_id'] not in ('mode-aware-ink-v2','mode-aware-ink-v3') or type(policy['enabled']) is not bool:
         raise Stopped('invalid_art_activation_policy')
     result = generate(**envelope, format_policy=policy['policy_id'] if policy['enabled'] else None, store=GitStore(root), transport=OpenAITransport(os.environ['OPENAI_API_KEY']),
                       publisher=GitPublisher(root), pilot=pilot)
