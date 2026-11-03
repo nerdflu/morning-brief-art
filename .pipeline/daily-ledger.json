@@ -768,8 +768,9 @@
     "fingerprint": "1284d3cd7f0d5221d42f5e2fa1c13d952a2bd01adeb5192c5feabb8d150ffd1f",
     "model": "gpt-image-2.5-flare",
     "month": "2026-11",
-    "reserved_cents": 50,
-    "state": "reserved"
+    "original_reserved_cents": 50,
+    "reserved_cents": 500,
+    "state": "submitted"
   },
   "budget-policy": {
     "approval_reference": "user-approved-2026-10-27-AUD5-daily-art",
