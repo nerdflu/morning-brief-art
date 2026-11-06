@@ -1,0 +1,30 @@
+{
+  "date": "2026-11-07",
+  "display_sha256": "43b8c05b66bc0cfe65aa0a2786276f772602bc797ecb76135c06829f4871ef95",
+  "fit_size": [
+    1200,
+    400
+  ],
+  "format_contract": "solo-panorama-v2",
+  "framing": "solo-panorama-v2-whole-source-fallback",
+  "framing_fallback": true,
+  "height": 400,
+  "image_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/17f782e4a122600e76f86bcc87cba1deb2244eb1/images/2026/11/2026-11-07-solo-panorama-v2.png",
+  "layout": "non-school",
+  "model": "gpt-image-2.5-flare",
+  "original_height": 624,
+  "original_sha256": "ed61f4c11eb69ee8b5ff1e766f10c47dffab8b54d92d94407d1224a006b083e0",
+  "original_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/1f41debac108a7988c0a1974818985ff0f05f039/images/2026/11/2026-11-07-solo-panorama-v2-original.png",
+  "original_width": 1872,
+  "paste_xy": [
+    336,
+    0
+  ],
+  "source_crop_bounds": [
+    0,
+    0,
+    1872,
+    624
+  ],
+  "width": 1872
+}
