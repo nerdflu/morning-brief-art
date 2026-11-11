@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-12",
+  "display_sha256": "96137e355a13033d9df2234056f5147bd2f057ab05734762f14b1c08d2331a9e",
+  "format_contract": "school-2x1-v2",
+  "framing": "school-2x1-v2",
+  "height": 480,
+  "image_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/90200bfa9fe5944b78b668d61e75570efb77b58a/images/2026/11/2026-11-12-school-v2.png",
+  "layout": "school",
+  "model": "gpt-image-2.5-flare",
+  "original_height": 768,
+  "original_sha256": "c5c6584cf14503514d6765dbbaf3ecb13ccb37941457987659f06df99b2c726c",
+  "original_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/0e620033c307c9b3f6a2ab550be2cc55d90c4b0d/images/2026/11/2026-11-12-school-v2-original.png",
+  "original_width": 1536,
+  "source_crop_bounds": [
+    0,
+    0,
+    1536,
+    768
+  ],
+  "width": 960
+}
