@@ -1594,15 +1594,45 @@
   "2026-11-16": {
     "date": "2026-11-16",
     "fingerprint": "fe5104e5c71008f6ba05b22c1010e5ad479fc03d821b89605b470577e840a9c5",
+    "invoice_verified": false,
+    "manifest": {
+      "date": "2026-11-16",
+      "display_sha256": "bb14ab032660fdab7a262fc329e331f61dc2c0da231e5b21f55436becb09e186",
+      "format_contract": "landscape-cover-v3",
+      "framing": "native-landscape-cover-v3",
+      "height": 624,
+      "image_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/ffa19b3812e9754f62cc4eefdeca17f92915f331/images/2026/11/2026-11-16-landscape-cover-v3.png",
+      "layout": "solo",
+      "manifest_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/36adc21a71944792ea4cf8cb4f34dd49efaccdd6/manifests/2026-11-16.json",
+      "model": "gpt-image-2.5-flare",
+      "original_height": 624,
+      "original_sha256": "bff57814836d5f30085a6257cde144a7ab1f1a06655ca9ad31aa635d574804a1",
+      "original_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/680c618cfc8169d0531cb4a673be8b3f2f046a14/images/2026/11/2026-11-16-landscape-cover-v3-original.png",
+      "original_width": 1872,
+      "source_crop_bounds": [
+        0,
+        0,
+        1872,
+        624
+      ],
+      "verified": true,
+      "width": 1872
+    },
     "model": "gpt-image-2.5-flare",
     "month": "2026-11",
     "original_reserved_cents": 50,
-    "reserved_cents": 50,
+    "reserved_cents": 2,
     "result": {
+      "archived_original_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/680c618cfc8169d0531cb4a673be8b3f2f046a14/images/2026/11/2026-11-16-landscape-cover-v3-original.png",
       "cost_basis": "Flare standard text input $5/M; image output $30/M; excludes FX/fees/tax",
       "estimated_cost_usd": 0.003285,
+      "format_contract": "landscape-cover-v3",
+      "framing": "native-landscape-cover-v3",
       "height": 624,
+      "layout": "solo",
       "model": "gpt-image-2.5-flare",
+      "original_height": 624,
+      "original_width": 1872,
       "reported_usage": {
         "input_tokens": 273,
         "input_tokens_details": {
@@ -1618,13 +1648,20 @@
       },
       "request_id": "req_e11313e54c3f44b4903fb24ca2ba0bac",
       "sha256": "bff57814836d5f30085a6257cde144a7ab1f1a06655ca9ad31aa635d574804a1",
+      "source_crop_bounds": [
+        0,
+        0,
+        1872,
+        624
+      ],
       "usage": {
         "input_tokens": 273,
         "output_tokens": 64
       },
       "width": 1872
     },
-    "state": "submitted"
+    "settlement_basis": "usage_estimate_usd_x_2_fx_x_1.2_fees_tax_rounded_up_plus_1_cent",
+    "state": "complete"
   },
   "budget-policy": {
     "approval_reference": "user-approved-2026-10-27-AUD5-daily-art",
