@@ -1669,7 +1669,33 @@
     "model": "gpt-image-2.5-flare",
     "month": "2026-11",
     "original_reserved_cents": 50,
-    "reserved_cents": 500,
+    "reserved_cents": 50,
+    "result": {
+      "cost_basis": "Flare standard text input $5/M; image output $30/M; excludes FX/fees/tax",
+      "estimated_cost_usd": 0.0033,
+      "height": 624,
+      "model": "gpt-image-2.5-flare",
+      "reported_usage": {
+        "input_tokens": 276,
+        "input_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 276
+        },
+        "output_tokens": 64,
+        "output_tokens_details": {
+          "image_tokens": 64,
+          "text_tokens": 0
+        },
+        "total_tokens": 340
+      },
+      "request_id": "req_85283d0849b04b7a9cee24c15e336651",
+      "sha256": "0911bade4d436d94c1f6bb654d6dc6516921fff09e10f56422197b7fa281d2cf",
+      "usage": {
+        "input_tokens": 276,
+        "output_tokens": 64
+      },
+      "width": 1872
+    },
     "state": "submitted"
   },
   "budget-policy": {
