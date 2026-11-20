@@ -1954,15 +1954,63 @@
   "2026-11-21": {
     "date": "2026-11-21",
     "fingerprint": "0200b763064ffb5c9189c1219d73fa56727516f1da7d4098c7c3915249805d7b",
+    "invoice_verified": false,
+    "manifest": {
+      "date": "2026-11-21",
+      "display_sha256": "46c1a50d1c62aaccbf8847a67cc24843c6dc2271892773eab3f3952a58afe0bc",
+      "fit_size": [
+        1200,
+        400
+      ],
+      "format_contract": "solo-panorama-v2",
+      "framing": "solo-panorama-v2-whole-source-fallback",
+      "framing_fallback": true,
+      "height": 400,
+      "image_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/4f21f470635ad8069a355cb1859d8794bf21c22b/images/2026/11/2026-11-21-solo-panorama-v2.png",
+      "layout": "non-school",
+      "manifest_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/e04424b0b66688a67b0d5bfca76826d84a890928/manifests/2026-11-21.json",
+      "model": "gpt-image-2.5-flare",
+      "original_height": 624,
+      "original_sha256": "6d53d54de818bc283f350e92e0537a0bc0577e12d540d49c874a733006756c93",
+      "original_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/fce3a263c88329b59441ec904f65c3782def711b/images/2026/11/2026-11-21-solo-panorama-v2-original.png",
+      "original_width": 1872,
+      "paste_xy": [
+        336,
+        0
+      ],
+      "source_crop_bounds": [
+        0,
+        0,
+        1872,
+        624
+      ],
+      "verified": true,
+      "width": 1872
+    },
     "model": "gpt-image-2.5-flare",
     "month": "2026-11",
     "original_reserved_cents": 50,
-    "reserved_cents": 50,
+    "reserved_cents": 2,
     "result": {
+      "archived_original_url": "https://raw.githubusercontent.com/nerdflu/morning-brief-art/fce3a263c88329b59441ec904f65c3782def711b/images/2026/11/2026-11-21-solo-panorama-v2-original.png",
       "cost_basis": "Flare standard text input $5/M; image output $30/M; excludes FX/fees/tax",
       "estimated_cost_usd": 0.003245,
-      "height": 624,
+      "fit_size": [
+        1200,
+        400
+      ],
+      "format_contract": "solo-panorama-v2",
+      "framing": "solo-panorama-v2-whole-source-fallback",
+      "framing_fallback": true,
+      "height": 400,
+      "layout": "non-school",
       "model": "gpt-image-2.5-flare",
+      "original_height": 624,
+      "original_width": 1872,
+      "paste_xy": [
+        336,
+        0
+      ],
       "reported_usage": {
         "input_tokens": 265,
         "input_tokens_details": {
@@ -1978,13 +2026,20 @@
       },
       "request_id": "req_2d27da9da3c44dd18de8f68161d29001",
       "sha256": "6d53d54de818bc283f350e92e0537a0bc0577e12d540d49c874a733006756c93",
+      "source_crop_bounds": [
+        0,
+        0,
+        1872,
+        624
+      ],
       "usage": {
         "input_tokens": 265,
         "output_tokens": 64
       },
       "width": 1872
     },
-    "state": "submitted"
+    "settlement_basis": "usage_estimate_usd_x_2_fx_x_1.2_fees_tax_rounded_up_plus_1_cent",
+    "state": "complete"
   },
   "budget-policy": {
     "approval_reference": "user-approved-2026-10-27-AUD5-daily-art",
